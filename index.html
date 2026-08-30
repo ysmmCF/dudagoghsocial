@@ -180,6 +180,19 @@
     </div>
   </div>
 
+  <!-- Identificação única do convidado, exibida depois da abertura. -->
+  <div id="identityOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/85 backdrop-blur-xl">
+    <section class="w-full max-w-sm glass-panel rounded-3xl p-7 sm:p-8 border border-amber-500/25 shadow-2xl text-center">
+      <p class="text-[10px] text-amber-300/70 uppercase tracking-[0.22em] mb-3">Uma noite para guardar</p>
+      <h2 class="font-serif text-2xl text-slate-100 mb-2">Bem-vindo à noite da Eduarda</h2>
+      <p class="text-xs text-slate-300 font-light leading-relaxed mb-7">Como devemos te chamar?</p>
+      <form onsubmit="saveGuestName(event)" class="space-y-4">
+        <input id="welcomeNameInput" type="text" required maxlength="40" autocomplete="name" placeholder="Seu nome" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <button type="submit" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">Continuar</button>
+      </form>
+    </section>
+  </div>
+
   <!-- Header Navigation -->
   <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/15 px-3.5 py-3 sm:px-8">
     <div class="max-w-7xl mx-auto flex items-center justify-between">
@@ -332,9 +345,10 @@
           </button>
         </div>
 
-        <div>
-          <label class="block text-xs font-medium text-amber-200/80 mb-1">Seu Nome (opcional)</label>
-          <input type="text" id="authorInput" placeholder="Ex: Yasmim" maxlength="40" class="w-full px-3.5 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-100 text-xs focus:border-amber-400 outline-none" />
+        <input type="hidden" id="authorInput" />
+        <div class="flex items-center gap-2 px-3.5 py-3 rounded-xl bg-slate-950/50 border border-slate-800">
+          <span class="text-xs text-amber-200/60">Publicando como</span>
+          <strong id="uploadAuthorName" class="text-xs text-slate-100 truncate"></strong>
         </div>
 
         <div>
@@ -379,6 +393,8 @@
     let sortMode = 'recent';
     let currentSessionId = localStorage.getItem('duda15_session') || ('guest_' + Math.random().toString(36).substring(2, 11));
     localStorage.setItem('duda15_session', currentSessionId);
+    // Persistência leve do convidado: só nome e identificador; fotos ficam no Storage.
+    let rememberedAuthor = localStorage.getItem('duda15_author') || '';
 
     // ==========================================================
     // CONFIGURAÇÃO DO SUPABASE
@@ -398,12 +414,31 @@
       const overlay = document.getElementById('entranceOverlay');
       if (overlay) {
         overlay.style.opacity = '0';
-        setTimeout(() => overlay.remove(), 1000);
+        setTimeout(() => {
+          overlay.remove();
+          showIdentityIfNeeded();
+        }, 1000);
       }
     }
 
     // Auto-dismiss após 3.2s (splash screen automática)
     setTimeout(dismissEntrance, 3200);
+
+    function showIdentityIfNeeded() {
+      if (rememberedAuthor) return;
+      const identityOverlay = document.getElementById('identityOverlay');
+      identityOverlay.classList.remove('hidden');
+      setTimeout(() => document.getElementById('welcomeNameInput').focus(), 80);
+    }
+
+    function saveGuestName(event) {
+      event.preventDefault();
+      const name = document.getElementById('welcomeNameInput').value.trim();
+      if (!name) return;
+      rememberedAuthor = name;
+      localStorage.setItem('duda15_author', name);
+      document.getElementById('identityOverlay').classList.add('hidden');
+    }
 
     function initStarryCanvas() {
       const canvas = document.getElementById('starryCanvas');
@@ -544,6 +579,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </button>
+                ${isMyPhoto ? `
+                  <button onclick="deletePhoto('${p.id}')" class="ml-auto flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-300 transition-colors" aria-label="Excluir minha foto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M4.772 5.79a48.108 48.108 0 011.022-.165m0 0a48.11 48.11 0 0114.412 0M6.75 5.625V4.5A2.25 2.25 0 019 2.25h6a2.25 2.25 0 012.25 2.25v1.125m-10.5 0h10.5M5.25 5.625h13.5l-.55 14.3a2.25 2.25 0 01-2.248 2.075H8.048A2.25 2.25 0 015.8 19.925L5.25 5.625z" />
+                    </svg>
+                    Excluir
+                  </button>` : ''}
               </div>
 
               <!-- Contagem de curtidas -->
@@ -582,6 +624,44 @@
         await supabaseClient.from('photos').update({ likes_count: likesCount, liked_by: likedBy }).eq('id', photoId);
       } else {
         saveLocalPhotos();
+      }
+    }
+
+    async function deletePhoto(photoId) {
+      const photo = photosList.find(item => item.id === photoId);
+      // A interface nunca mostra o botão para outra pessoa; esta checagem evita chamadas acidentais.
+      if (!photo || photo.session_id !== currentSessionId) return;
+      if (!window.confirm('Excluir esta foto do mural? Esta ação não pode ser desfeita.')) return;
+
+      const previousPhotos = [...photosList];
+      photosList = photosList.filter(item => item.id !== photoId);
+      renderFeed();
+
+      try {
+        if (supabaseClient) {
+          const { error: dbError } = await supabaseClient
+            .from('photos')
+            .delete()
+            .eq('id', photoId)
+            .eq('session_id', currentSessionId);
+          if (dbError) throw dbError;
+
+          // Remove o arquivo apenas quando a URL pertence ao bucket público memories.
+          const marker = '/storage/v1/object/public/memories/';
+          const position = (photo.image_url || '').indexOf(marker);
+          if (position !== -1) {
+            const objectPath = decodeURIComponent(photo.image_url.slice(position + marker.length).split('?')[0]);
+            const { error: storageError } = await supabaseClient.storage.from('memories').remove([objectPath]);
+            if (storageError) console.warn('Post removido, mas o arquivo não pôde ser removido:', storageError);
+          }
+        } else {
+          saveLocalPhotos();
+        }
+      } catch (error) {
+        console.error('Erro ao excluir a foto:', error);
+        photosList = previousPhotos;
+        renderFeed();
+        alert('Não foi possível excluir a foto. Tente novamente.');
       }
     }
 
@@ -631,7 +711,14 @@
         return;
       }
 
-      const author = document.getElementById('authorInput').value.trim() || 'Convidado Especial';
+      const author = document.getElementById('authorInput').value.trim();
+      if (!author) {
+        alert('Informe seu nome antes de publicar.');
+        document.getElementById('authorInput').focus();
+        return;
+      }
+      rememberedAuthor = author;
+      localStorage.setItem('duda15_author', author);
       const caption = document.getElementById('captionInput').value.trim();
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
@@ -693,8 +780,14 @@
     }
 
     function openUploadModal() {
+      if (!rememberedAuthor) {
+        showIdentityIfNeeded();
+        return;
+      }
       clearFileSelection();
-      document.getElementById('authorInput').value = '';
+      // O nome informado na abertura acompanha todas as publicações deste navegador.
+      document.getElementById('authorInput').value = rememberedAuthor;
+      document.getElementById('uploadAuthorName').textContent = rememberedAuthor;
       document.getElementById('captionInput').value = '';
       document.getElementById('uploadModal').classList.remove('hidden');
     }
