@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Moderação de Memórias | Eduarda 15 Anos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            starry: { night: '#040714', deep: '#080d22', navy: '#0f1736', gold: '#d4af37' }
+          },
+          fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Outfit', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      background-color: #040714;
+      color: #f8f6f0;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ==============================================================================
+       IMAGEM DE FUNDO OFICIAL (A NOITE ESTRELADA DE VAN GOGH - WIKIMEDIA)
+       ============================================================================== */
+    .van-gogh-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(180deg, rgba(4, 7, 20, 0.82) 0%, rgba(4, 7, 20, 0.92) 100%),
+        url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-color: #040714;
+    }
+
+    .glass-panel {
+      background: rgba(10, 15, 36, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .gold-button {
+      background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+      color: #040714;
+      font-weight: 600;
+    }
+
+    .touch-target {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col min-h-screen">
+  <div class="van-gogh-bg"></div>
+  <canvas id="starryCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/15 px-3.5 py-3.5 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1.5 text-xs sm:text-sm text-amber-300/90 hover:text-amber-100 font-light tracking-wide touch-target">
+        ← Voltar ao Mural
+      </a>
+      <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 border border-amber-500/20 text-amber-300 text-[11px] font-light tracking-wider uppercase">
+        Moderação
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-8 z-10 relative">
+
+    <!-- Auth Login Dialog -->
+    <div id="authDialog" class="max-w-md mx-auto my-8 sm:my-12 p-6 sm:p-8 glass-panel rounded-3xl border border-amber-500/20 shadow-2xl text-center">
+      <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+        <svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <h2 class="font-serif text-xl sm:text-2xl font-normal text-slate-100 mb-2">Acesso Restrito</h2>
+      <p class="text-xs text-slate-300 font-light leading-relaxed mb-5">Digite a senha de administrador para moderar e excluir fotos do mural.</p>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <input type="password" id="adminPasswordInput" placeholder="Digite a senha" class="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 focus:border-amber-400 text-slate-100 text-xs text-center outline-none tracking-widest" />
+        <p id="authErrorMsg" class="hidden text-xs text-rose-400 font-medium">Senha incorreta. Tente novamente.</p>
+        <button type="submit" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">
+          Entrar no Painel
+        </button>
+      </form>
+    </div>
+
+    <!-- Admin Content Dashboard -->
+    <div id="adminDashboard" class="hidden space-y-6 sm:space-y-8">
+      <!-- Metrics Overview -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Total de Fotos</div>
+            <div id="totalPhotosCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Total de Curtidas</div>
+            <div id="totalLikesCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 15a4 4 0 004 4h9a5 5 0 001-9.999 5.002 5.002 0 00-9.78 2.096A4.001 4.001 0 003 15z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Status do Banco</div>
+            <div id="dbStatusBadge" class="text-xs font-medium text-emerald-400 mt-0.5">Conectado</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <h2 class="font-serif text-lg sm:text-xl font-normal text-slate-100">
+          Moderação de Memórias
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="loadAdminPhotos()" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 hover:text-white touch-target">
+            Atualizar
+          </button>
+          <button onclick="handleLogout()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-medium text-rose-300 touch-target">
+            Sair
+          </button>
+        </div>
+      </div>
+
+      <!-- Photos Management Table -->
+      <div id="tableContainer" class="glass-panel rounded-3xl overflow-hidden border border-amber-500/20 shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-950/80 text-amber-200/70 uppercase tracking-wider font-light border-b border-slate-800 text-[10px] sm:text-[11px]">
+              <tr>
+                <th class="py-3.5 px-4">Foto</th>
+                <th class="py-3.5 px-4">Autor</th>
+                <th class="py-3.5 px-4">Legenda</th>
+                <th class="py-3.5 px-4">Data/Hora</th>
+                <th class="py-3.5 px-4">Curtidas</th>
+                <th class="py-3.5 px-4 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="photosTableBody" class="divide-y divide-slate-800/60 font-light"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let adminPhotos = [];
+    let supabaseUrl = localStorage.getItem('SUPABASE_URL') || '';
+    let supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY') || '';
+    let supabaseClient = null;
+
+    if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+      try { supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey); } catch(e){}
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPasswordInput').value;
+      const ADMIN_SECRET = 'Dani1980';
+
+      if (pass === ADMIN_SECRET) {
+        document.getElementById('authDialog').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        sessionStorage.setItem('admin_logged', 'true');
+        loadAdminPhotos();
+      } else {
+        document.getElementById('authErrorMsg').classList.remove('hidden');
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('admin_logged');
+      document.getElementById('authDialog').classList.remove('hidden');
+      document.getElementById('adminDashboard').classList.add('hidden');
+    }
+
+    async function loadAdminPhotos() {
+      const dbBadge = document.getElementById('dbStatusBadge');
+
+      if (supabaseClient) {
+        dbBadge.textContent = 'Supabase Nuvem';
+        dbBadge.className = 'text-xs font-medium text-emerald-400 mt-0.5';
+        const { data, error } = await supabaseClient.from('photos').select('*').order('created_at', { ascending: false });
+        if (!error && data) {
+          adminPhotos = data;
+          renderAdminTable();
+          return;
+        }
+      }
+
+      dbBadge.textContent = 'Armazenamento Local';
+      dbBadge.className = 'text-xs font-medium text-amber-400 mt-0.5';
+      const localData = localStorage.getItem('duda15_photos');
+      adminPhotos = localData ? JSON.parse(localData) : [];
+      renderAdminTable();
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('photosTableBody');
+      document.getElementById('totalPhotosCount').textContent = adminPhotos.length;
+      
+      const totalLikes = adminPhotos.reduce((acc, p) => acc + (p.likes_count || 0), 0);
+      document.getElementById('totalLikesCount').textContent = totalLikes;
+
+      if (adminPhotos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs">Nenhuma foto publicada até o momento.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = adminPhotos.map(p => `
+        <tr class="hover:bg-slate-900/40 transition-colors">
+          <td class="py-3 px-4">
+            <img src="${p.image_url}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover bg-black border border-amber-500/20" alt="Thumb" />
+          </td>
+          <td class="py-3 px-4 font-medium text-slate-200">${escapeHtml(p.author || 'Convidado Especial')}</td>
+          <td class="py-3 px-4 max-w-[150px] sm:max-w-xs truncate text-slate-300">${p.caption ? `"${escapeHtml(p.caption)}"` : '-'}</td>
+          <td class="py-3 px-4 text-slate-400 whitespace-nowrap">${formatDate(p.created_at)}</td>
+          <td class="py-3 px-4 text-amber-300 font-medium">${p.likes_count || 0}</td>
+          <td class="py-3 px-4 text-right">
+            <button onclick="deletePhotoByAdmin('${p.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition-colors font-light text-xs touch-target">
+              Excluir
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function deletePhotoByAdmin(photoId) {
+      if (!confirm('Deseja realmente apagar esta foto do mural permanentemente?')) return;
+
+      const p = adminPhotos.find(item => item.id === photoId);
+
+      if (supabaseClient) {
+        if (p && p.image_url && p.image_url.includes('/memories/')) {
+          try {
+            const fileName = p.image_url.split('/memories/')[1];
+            if (fileName) await supabaseClient.storage.from('memories').remove([fileName]);
+          } catch(e){}
+        }
+        await supabaseClient.from('photos').delete().eq('id', photoId);
+      }
+
+      adminPhotos = adminPhotos.filter(item => item.id !== photoId);
+      localStorage.setItem('duda15_photos', JSON.stringify(adminPhotos));
+      renderAdminTable();
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return '-';
+      return new Date(isoStr).toLocaleString('pt-BR');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const canvas = document.getElementById('starryCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+      window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+      const stars = Array.from({ length: 50 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5, a: Math.random() }));
+      function anim() {
+        ctx.clearRect(0, 0, w, h);
+        stars.forEach(s => { ctx.fillStyle = '#d4af37'; ctx.globalAlpha = s.a; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+        requestAnimationFrame(anim);
+      }
+      anim();
+
+      if (sessionStorage.getItem('admin_logged') === 'true') {
+        document.getElementById('authDialog').classList.add('hidden');
+        document.getElementById('adminDashboard').classList.remove('hidden');
+        loadAdminPhotos();
+      }
+    });
+  </script>
+</body>
+</html>

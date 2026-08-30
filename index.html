@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Eduarda 15 Anos | Mural de Memórias</title>
+
+  <!-- Google Fonts: Playfair Display & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            starry: {
+              night: '#040714',
+              deep: '#080d22',
+              navy: '#0f1736',
+              blue: '#16224d',
+              gold: '#d4af37',
+              'gold-light': '#f3e5ab',
+              'gold-dark': '#997a15',
+            }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Outfit', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --color-gold: #d4af37;
+    }
+    body {
+      background-color: #040714;
+      color: #f8f6f0;
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ==============================================================================
+       IMAGEM DE FUNDO OFICIAL (A NOITE ESTRELADA DE VAN GOGH - WIKIMEDIA)
+       ============================================================================== */
+    .van-gogh-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(180deg, rgba(4, 7, 20, 0.78) 0%, rgba(4, 7, 20, 0.88) 100%),
+        url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-color: #040714;
+    }
+
+    .glass-panel {
+      background: rgba(10, 15, 36, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-card {
+      background: rgba(12, 18, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      box-shadow: 0 6px 24px 0 rgba(2, 4, 12, 0.6);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(212, 175, 55, 0.35);
+      box-shadow: 0 14px 36px -4px rgba(212, 175, 55, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .gold-text {
+      background: linear-gradient(135deg, #fffcf5 0%, #f3e5ab 30%, #d4af37 70%, #997a15 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .gold-button {
+      background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+      color: #040714;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    /* Otimização de botões para telas de celular (Min height 44px) */
+    .touch-target {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Keyframes para Animação de Entrada */
+    @keyframes fadeInEduarda {
+      0% { opacity: 0; transform: scale(0.9) translateY(15px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes fadeIn15Anos {
+      0% { opacity: 0; transform: scale(0.9) translateY(15px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .animate-eduarda {
+      animation: fadeInEduarda 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.2s;
+      opacity: 0;
+    }
+
+    .animate-15anos {
+      animation: fadeIn15Anos 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.9s; /* Retardado em relação ao nome */
+      opacity: 0;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #040714; }
+    ::-webkit-scrollbar-thumb { background: #16224d; border-radius: 2px; }
+  </style>
+</head>
+<body class="relative flex flex-col min-h-screen pb-24 sm:pb-0">
+
+  <!-- Artistic Van Gogh Background Layer -->
+  <div class="van-gogh-bg"></div>
+  <canvas id="starryCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+  <!-- ==============================================================================
+       TELA DE ENTRADA ANIMADA (OVERLAY DE BOAS-VINDAS)
+       ============================================================================== -->
+  <div id="entranceOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-950/90 backdrop-blur-2xl transition-opacity duration-1000">
+    <div class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none" style="background-image: url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');"></div>
+    
+    <div class="relative z-10 text-center max-w-md mx-auto">
+      <div class="w-36 h-36 mx-auto mb-6 rounded-full shadow-2xl border border-amber-400/40 overflow-hidden">
+        <img src="https://ysmmcf.github.io/DudaGogh/R_20260830_164344_0000.png" alt="Logo" class="w-full h-full object-cover" />
+      </div>
+
+      <!-- Nome Eduarda (Fade-in primeiro) -->
+      <h1 class="animate-eduarda font-serif text-5xl sm:text-7xl font-normal tracking-tight text-slate-100 mb-2">
+        Eduarda
+      </h1>
+
+      <!-- 15 Anos (Fade-in levemente atrasado) -->
+      <div class="animate-15anos">
+        <p class="font-serif italic text-3xl sm:text-4xl gold-text font-light mb-6">
+          15 Anos
+        </p>
+
+        <p class="text-xs text-amber-200/60 font-light tracking-widest uppercase">
+          Noite Estrelada • Mural de Memórias
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/15 px-3.5 py-3 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full shadow-lg border border-amber-400/30 shrink-0 overflow-hidden">
+          <img src="https://ysmmcf.github.io/DudaGogh/R_20260830_164344_0000.png" alt="Logo" class="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h1 class="font-serif text-base sm:text-xl font-medium tracking-wide text-slate-100 flex items-center gap-1.5 leading-tight">
+            Eduarda <span class="gold-text font-semibold">15 Anos</span>
+          </h1>
+          <p class="text-[9px] sm:text-xs text-amber-200/50 font-light tracking-widest uppercase">
+            Noite Estrelada
+          </p>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a href="indexadministrador.html" title="Área de Moderação" class="p-2 text-slate-400 hover:text-amber-300 rounded-full transition-colors touch-target">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+          </svg>
+        </a>
+
+        <button onclick="openUploadModal()" class="flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm rounded-full gold-button shadow-md touch-target font-medium">
+          <svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="hidden xs:inline">Publicar Foto</span>
+          <span class="xs:hidden">Publicar</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Section -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 pt-6 pb-12 z-10 relative">
+    <section class="text-center max-w-2xl mx-auto mb-8">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-900/80 border border-amber-500/20 text-amber-300/90 text-[11px] font-light tracking-wider uppercase mb-3 backdrop-blur-md">
+        <span>Festa de 15 Anos</span>
+      </div>
+
+      <h1 class="font-serif text-3xl sm:text-5xl md:text-6xl font-normal tracking-tight text-slate-100 mb-3 leading-tight">
+        Festa da <span class="gold-text font-serif italic">Eduarda</span>
+      </h1>
+
+      <p class="text-slate-300 text-xs sm:text-base max-w-lg mx-auto leading-relaxed mb-6 font-light">
+        Registre seus momentos inesquecíveis sob o céu inspirado na Noite Estrelada de Van Gogh e compartilhe esta noite conosco.
+      </p>
+
+      <!-- Real Memory Counter Badge -->
+      <div class="inline-flex items-center justify-between gap-4 px-5 py-3.5 rounded-2xl glass-panel max-w-xs mx-auto w-full border border-amber-500/20 shadow-xl">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <svg class="w-4 h-4 fill-amber-400/20 stroke-amber-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </div>
+          <div class="text-left">
+            <div id="memoryCounter" class="font-serif text-xl sm:text-2xl font-semibold text-slate-100 leading-none">0</div>
+            <div id="counterLabel" class="text-[10px] text-amber-200/60 font-light tracking-wider uppercase mt-1">memórias compartilhadas</div>
+          </div>
+        </div>
+
+        <button onclick="openUploadModal()" class="p-2 text-amber-300 hover:text-amber-100 touch-target">
+          <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- Filter Bar Desktop & Feed -->
+    <section>
+      <div class="hidden sm:flex items-center justify-between flex-wrap gap-3 mb-6 pb-3 border-b border-amber-500/15">
+        <h2 id="feedTitle" class="font-serif text-lg sm:text-2xl font-normal text-slate-100 tracking-wide">
+          Mural de Fotos
+        </h2>
+
+        <div class="flex items-center gap-1 p-1 rounded-full bg-slate-950/80 border border-amber-500/15">
+          <button id="tabRecent" onclick="setSortMode('recent')" class="px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all">
+            Mais Recentes
+          </button>
+          <button id="tabHighlights" onclick="setSortMode('highlights')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">
+            Momentos em Destaque
+          </button>
+          <button id="tabMyPhotos" onclick="setSortMode('my-photos')" class="px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">
+            Minhas Fotos
+          </button>
+        </div>
+      </div>
+
+      <!-- Feed Grid -->
+      <div id="photoFeed" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"></div>
+
+      <!-- Zero Content Empty State -->
+      <div id="emptyState" class="hidden max-w-md mx-auto my-8 p-6 sm:p-8 rounded-3xl glass-panel text-center border border-amber-500/20 shadow-2xl relative overflow-hidden">
+        <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-gradient-to-tr from-slate-950 to-indigo-950 border border-amber-500/20 flex items-center justify-center text-amber-400 shadow-xl">
+          <svg class="w-7 h-7 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+          </svg>
+        </div>
+        <h3 id="emptyStateTitle" class="font-serif text-xl font-normal text-slate-100 mb-2">À espera das primeiras memórias</h3>
+        <p id="emptyStateDesc" class="text-slate-300 text-xs font-light leading-relaxed mb-5">
+          Compartilhe uma foto e faça parte da história desta noite especial.
+        </p>
+        <button onclick="openUploadModal()" class="w-full sm:w-auto px-6 py-3 rounded-full gold-button text-xs font-semibold shadow-lg touch-target">
+          <span>Compartilhar primeira foto</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==============================================================================
+       BARRA DE NAVEGAÇÃO INFERIOR PARA CELULARES (MOBILE BOTTOM NAVIGATION BAR)
+       ============================================================================== -->
+  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 sm:hidden glass-panel border-t border-amber-500/20 px-2 py-1.5 flex items-center justify-around shadow-2xl">
+    <!-- Tab 1: Mural Geral -->
+    <button id="navMural" onclick="setSortMode('recent')" class="flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors">
+      <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      <span class="text-[10px] font-medium mt-0.5">Mural</span>
+    </button>
+
+    <!-- Tab 2: Destaques -->
+    <button id="navDestaques" onclick="setSortMode('highlights')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+      <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+      </svg>
+      <span class="text-[10px] font-medium mt-0.5">Destaques</span>
+    </button>
+
+    <!-- Tab 3: Publicar Foto (Central Highlight Button) -->
+    <button onclick="openUploadModal()" class="flex flex-col items-center justify-center -mt-5">
+      <div class="w-12 h-12 rounded-full gold-button flex items-center justify-center shadow-xl border border-amber-300/40">
+        <svg class="w-6 h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+      </div>
+      <span class="text-[10px] font-medium text-amber-300 mt-1">Publicar</span>
+    </button>
+
+    <!-- Tab 4: Minhas Fotos -->
+    <button id="navMinhas" onclick="setSortMode('my-photos')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+      <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+      <span class="text-[10px] font-medium mt-0.5">Minhas Fotos</span>
+    </button>
+
+    <!-- Tab 5: Admin -->
+    <a href="indexadministrador.html" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+      <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+      </svg>
+      <span class="text-[10px] font-medium mt-0.5">Admin</span>
+    </a>
+  </nav>
+
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div onclick="closeUploadModal()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md"></div>
+    <div class="relative w-full max-w-lg glass-panel rounded-3xl p-5 sm:p-8 border border-amber-500/25 shadow-2xl z-10 my-auto max-h-[92vh] overflow-y-auto">
+      <button onclick="closeUploadModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-100 rounded-full bg-slate-900/60 border border-slate-700/40 touch-target">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+          <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-serif text-lg sm:text-xl font-normal text-slate-100">Publicar Memória</h3>
+          <p class="text-[11px] text-amber-200/50">15 Anos da Eduarda</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleUploadSubmit(event)" class="space-y-4">
+        <input type="file" id="photoFileInput" accept="image/*" onchange="handleFileSelect(event)" class="hidden" />
+
+        <div id="dropzone" onclick="document.getElementById('photoFileInput').click()" class="w-full h-40 sm:h-44 border border-dashed border-amber-500/25 hover:border-amber-400 rounded-2xl bg-slate-950/40 flex flex-col items-center justify-center p-4 cursor-pointer text-center transition-colors">
+          <div class="w-9 h-9 rounded-full bg-slate-900 border border-amber-500/20 flex items-center justify-center text-amber-300 mb-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <p class="text-xs font-medium text-slate-200">Toque para escolher foto ou tirar com a câmera</p>
+          <p class="text-[10px] text-slate-400 mt-1">Compressão automática para celular</p>
+        </div>
+
+        <div id="imagePreviewContainer" class="hidden relative w-full h-48 sm:h-52 rounded-2xl overflow-hidden bg-black border border-amber-500/30">
+          <img id="imagePreview" class="w-full h-full object-contain" src="" alt="Preview" />
+          <button type="button" onclick="clearFileSelection()" class="absolute top-3 right-3 px-3 py-1.5 rounded-full bg-slate-950/80 text-amber-300 text-xs font-medium border border-amber-500/30 touch-target">
+            Trocar foto
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-amber-200/80 mb-1">Seu Nome (opcional)</label>
+          <input type="text" id="authorInput" placeholder="Ex: Yasmim" maxlength="40" class="w-full px-3.5 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-100 text-xs focus:border-amber-400 outline-none" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-amber-200/80 mb-1">Legenda</label>
+          <textarea id="captionInput" rows="2" placeholder="Uma noite inesquecível sob as estrelas..." maxlength="300" class="w-full px-3.5 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-100 text-xs focus:border-amber-400 outline-none resize-none"></textarea>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">
+          Publicar no Mural
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightboxModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <div onclick="closeLightbox()" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl"></div>
+    <div class="relative max-w-4xl w-full glass-panel rounded-3xl overflow-hidden border border-amber-500/30 shadow-2xl z-10 flex flex-col md:flex-row my-auto max-h-[92vh]">
+      <button onclick="closeLightbox()" class="absolute top-3 right-3 z-20 p-2 rounded-full bg-slate-950/80 border border-slate-700 text-slate-300 hover:text-white touch-target">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+      </button>
+      <div class="relative flex-1 bg-black min-h-[260px] md:min-h-[460px] flex items-center justify-center">
+        <img id="lightboxImg" class="w-full h-full object-contain" src="" alt="Foto" />
+      </div>
+      <div class="w-full md:w-80 p-5 bg-slate-950/90 flex flex-col justify-between border-t md:border-t-0 md:border-l border-amber-500/20">
+        <div>
+          <h4 id="lightboxAuthor" class="font-medium text-slate-100 text-sm mb-1">Convidado Especial</h4>
+          <p id="lightboxTime" class="text-xs text-amber-200/50 mb-3">agora mesmo</p>
+          <p id="lightboxCaption" class="text-slate-300 text-xs font-light leading-relaxed italic mb-4"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="z-10 py-6 border-t border-amber-500/10 text-center text-xs text-amber-200/40 font-light glass-panel">
+    15 Anos da Eduarda • Noite Estrelada
+  </footer>
+
+  <script>
+    let photosList = [];
+    let sortMode = 'recent';
+    let currentSessionId = localStorage.getItem('duda15_session') || ('guest_' + Math.random().toString(36).substring(2, 11));
+    localStorage.setItem('duda15_session', currentSessionId);
+
+    let supabaseUrl = localStorage.getItem('SUPABASE_URL') || '';
+    let supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY') || '';
+    let supabaseClient = null;
+
+    if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+      try { supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey); } catch (e) {}
+    }
+
+    function dismissEntrance() {
+      const overlay = document.getElementById('entranceOverlay');
+      if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 1000);
+      }
+    }
+
+    // Auto-dismiss após 3.2s (splash screen automática)
+    setTimeout(dismissEntrance, 3200);
+
+    function initStarryCanvas() {
+      const canvas = document.getElementById('starryCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const colors = ['#d4af37', '#f3e5ab', '#ffffff', '#60a5fa'];
+      const stars = Array.from({ length: 70 }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.3,
+        c: colors[Math.floor(Math.random() * colors.length)],
+        a: Math.random() * 0.6 + 0.2,
+        s: Math.random() * 0.015 + 0.005
+      }));
+
+      let frame = 0;
+      function animate() {
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+        stars.forEach(st => {
+          st.a += Math.sin(frame * st.s) * 0.01;
+          if (st.a > 0.8) st.a = 0.8;
+          if (st.a < 0.1) st.a = 0.1;
+          ctx.save();
+          ctx.globalAlpha = st.a;
+          ctx.fillStyle = st.c;
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    async function loadPhotos() {
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient.from('photos').select('*').order('created_at', { ascending: false });
+        if (!error && data) {
+          photosList = data;
+          renderFeed();
+          return;
+        }
+      }
+      const localData = localStorage.getItem('duda15_photos');
+      photosList = localData ? JSON.parse(localData) : [];
+      renderFeed();
+    }
+
+    function saveLocalPhotos() {
+      localStorage.setItem('duda15_photos', JSON.stringify(photosList));
+    }
+
+    function renderFeed() {
+      const feedEl = document.getElementById('photoFeed');
+      const emptyEl = document.getElementById('emptyState');
+      const counterEl = document.getElementById('memoryCounter');
+      const feedTitleEl = document.getElementById('feedTitle');
+
+      counterEl.textContent = photosList.length;
+
+      let displayed = [...photosList];
+
+      if (sortMode === 'highlights') {
+        if (feedTitleEl) feedTitleEl.textContent = "Momentos em Destaque";
+        displayed.sort((a, b) => {
+          if ((b.likes_count || 0) !== (a.likes_count || 0)) {
+            return (b.likes_count || 0) - (a.likes_count || 0);
+          }
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+      } else if (sortMode === 'my-photos') {
+        if (feedTitleEl) feedTitleEl.textContent = "Minhas Fotos Compartilhadas";
+        displayed = displayed.filter(p => p.session_id === currentSessionId);
+      } else {
+        if (feedTitleEl) feedTitleEl.textContent = "Mural de Fotos";
+        displayed.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+
+      if (displayed.length === 0) {
+        feedEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        
+        if (sortMode === 'my-photos') {
+          document.getElementById('emptyStateTitle').textContent = 'Você ainda não compartilhou fotos';
+          document.getElementById('emptyStateDesc').textContent = 'Envie sua primeira foto da festa e ela aparecerá nesta aba!';
+        } else {
+          document.getElementById('emptyStateTitle').textContent = 'À espera das primeiras memórias';
+          document.getElementById('emptyStateDesc').textContent = 'Compartilhe uma foto e faça parte da história desta noite especial.';
+        }
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+
+      feedEl.innerHTML = displayed.map(p => {
+        const likedBy = Array.isArray(p.liked_by) ? p.liked_by : [];
+        const isLiked = likedBy.includes(currentSessionId);
+        const isMyPhoto = p.session_id === currentSessionId;
+        const timeStr = formatTimeAgo(p.created_at);
+
+        return `
+          <div class="glass-card rounded-2xl overflow-hidden flex flex-col group relative">
+            <div class="p-3.5 flex items-center justify-between border-b border-slate-800/60 bg-slate-950/40">
+              <div class="flex items-center gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-slate-900 border border-amber-500/20 flex items-center justify-center text-amber-300 text-xs font-semibold">
+                  ${(p.author || 'C')[0].toUpperCase()}
+                </div>
+                <div>
+                  <h4 class="text-xs font-medium text-slate-100 flex items-center gap-1.5">
+                    <span>${escapeHtml(p.author || 'Convidado Especial')}</span>
+                    ${isMyPhoto ? '<span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">Você</span>' : ''}
+                  </h4>
+                  <p class="text-[10px] text-amber-200/50">${timeStr}</p>
+                </div>
+              </div>
+            </div>
+
+            <div onclick="openLightbox('${p.id}')" class="relative w-full aspect-square bg-black overflow-hidden cursor-pointer">
+              <img src="${p.image_url}" alt="Foto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+
+            <div class="p-4 flex flex-col gap-2 bg-slate-950/30 flex-1 justify-between">
+              ${p.caption ? `<p class="text-xs sm:text-sm text-slate-200 font-light leading-relaxed">"${escapeHtml(p.caption)}"</p>` : ''}
+              <div class="flex items-center justify-between pt-2 border-t border-slate-800/40">
+                <button onclick="toggleLike('${p.id}')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all touch-target ${isLiked ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30' : 'bg-slate-900/80 text-slate-300 border border-slate-800'}">
+                  <svg class="w-3.5 h-3.5 ${isLiked ? 'fill-rose-400 stroke-rose-400' : 'stroke-current'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span>${p.likes_count || 0}</span>
+                </button>
+                <span class="text-[10px] text-amber-200/40">${p.likes_count === 1 ? '1 curtida' : (p.likes_count || 0) + ' curtidas'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function toggleLike(photoId) {
+      const p = photosList.find(item => item.id === photoId);
+      if (!p) return;
+
+      let likedBy = Array.isArray(p.liked_by) ? p.liked_by : [];
+      let likesCount = p.likes_count || 0;
+      const isLiked = likedBy.includes(currentSessionId);
+
+      if (isLiked) {
+        likedBy = likedBy.filter(id => id !== currentSessionId);
+        likesCount = Math.max(0, likesCount - 1);
+      } else {
+        likedBy.push(currentSessionId);
+        likesCount += 1;
+      }
+
+      p.liked_by = likedBy;
+      p.likes_count = likesCount;
+
+      renderFeed();
+
+      if (supabaseClient) {
+        await supabaseClient.from('photos').update({ likes_count: likesCount, liked_by: likedBy }).eq('id', photoId);
+      } else {
+        saveLocalPhotos();
+      }
+    }
+
+    let selectedCompressedFile = null;
+
+    async function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          let w = img.width, h = img.height;
+          const maxDim = 1920;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/webp', 0.85);
+
+          document.getElementById('imagePreview').src = dataUrl;
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          document.getElementById('dropzone').classList.add('hidden');
+          selectedCompressedFile = dataUrl;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearFileSelection() {
+      selectedCompressedFile = null;
+      document.getElementById('photoFileInput').value = '';
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+      document.getElementById('dropzone').classList.remove('hidden');
+    }
+
+    async function handleUploadSubmit(e) {
+      e.preventDefault();
+      if (!selectedCompressedFile) {
+        alert('Selecione uma foto para publicar.');
+        return;
+      }
+
+      const author = document.getElementById('authorInput').value.trim() || 'Convidado Especial';
+      const caption = document.getElementById('captionInput').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando foto...';
+
+      let imageUrl = selectedCompressedFile;
+
+      if (supabaseClient) {
+        try {
+          const blob = await (await fetch(selectedCompressedFile)).blob();
+          const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.webp';
+          const { data: stData, error: stErr } = await supabaseClient.storage.from('memories').upload(fileName, blob, { contentType: 'image/webp' });
+
+          if (!stErr) {
+            const { data: pubData } = supabaseClient.storage.from('memories').getPublicUrl(fileName);
+            imageUrl = pubData.publicUrl;
+          }
+
+          const { data: dbData, error: dbErr } = await supabaseClient.from('photos').insert([{
+            image_url: imageUrl,
+            author: author,
+            caption: caption,
+            likes_count: 0,
+            liked_by: [],
+            session_id: currentSessionId
+          }]).select().single();
+
+          if (!dbErr && dbData) {
+            photosList.unshift(dbData);
+          }
+        } catch (err) {
+          console.error('Supabase upload fallback to local:', err);
+        }
+      }
+
+      if (!supabaseClient || !imageUrl.startsWith('http')) {
+        const newPhoto = {
+          id: 'photo_' + Date.now(),
+          image_url: imageUrl,
+          author: author,
+          caption: caption,
+          likes_count: 0,
+          liked_by: [],
+          session_id: currentSessionId,
+          created_at: new Date().toISOString()
+        };
+        photosList.unshift(newPhoto);
+        saveLocalPhotos();
+      }
+
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 }, colors: ['#d4af37', '#f3e5ab', '#ffffff'] });
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publicar no Mural';
+      closeUploadModal();
+      renderFeed();
+    }
+
+    function openUploadModal() {
+      clearFileSelection();
+      document.getElementById('authorInput').value = '';
+      document.getElementById('captionInput').value = '';
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+    function closeUploadModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+    function openLightbox(photoId) {
+      const p = photosList.find(item => item.id === photoId);
+      if (!p) return;
+      document.getElementById('lightboxImg').src = p.image_url;
+      document.getElementById('lightboxAuthor').textContent = p.author || 'Convidado Especial';
+      document.getElementById('lightboxTime').textContent = formatTimeAgo(p.created_at);
+      document.getElementById('lightboxCaption').textContent = p.caption ? `"${p.caption}"` : '';
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+    function closeLightbox() { document.getElementById('lightboxModal').classList.add('hidden'); }
+
+    function setSortMode(mode) {
+      sortMode = mode;
+
+      // Update Desktop Tabs
+      ['tabRecent', 'tabHighlights', 'tabMyPhotos'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
+      });
+
+      if (mode === 'recent') {
+        const el = document.getElementById('tabRecent'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
+      } else if (mode === 'highlights') {
+        const el = document.getElementById('tabHighlights'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
+      } else if (mode === 'my-photos') {
+        const el = document.getElementById('tabMyPhotos'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
+      }
+
+      // Update Mobile Bottom Nav Colors
+      ['navMural', 'navDestaques', 'navMinhas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors';
+      });
+
+      if (mode === 'recent') {
+        const el = document.getElementById('navMural'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+      } else if (mode === 'highlights') {
+        const el = document.getElementById('navDestaques'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+      } else if (mode === 'my-photos') {
+        const el = document.getElementById('navMinhas'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+      }
+
+      renderFeed();
+    }
+
+    function formatTimeAgo(isoString) {
+      if (!isoString) return 'agora';
+      const diff = Math.floor((new Date().getTime() - new Date(isoString).getTime()) / 1000);
+      if (diff < 60) return 'agora mesmo';
+      if (diff < 3600) return `há ${Math.floor(diff / 60)} min`;
+      if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+      return new Date(isoString).toLocaleDateString('pt-BR');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initStarryCanvas();
+      loadPhotos();
+    });
+  </script>
+</body>
+</html>
