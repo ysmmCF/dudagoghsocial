@@ -183,10 +183,30 @@
   </main>
 
   <script>
-    let adminPhotos = [];
-    let supabaseUrl = localStorage.getItem('SUPABASE_URL') || '';
-    let supabaseAnonKey = localStorage.getItem('SUPABASE_ANON_KEY') || '';
-    let supabaseClient = null;
+   let adminPhotos = [];
+
+const supabaseUrl = 'https://fmvucmpomfogfzfdpfln.supabase.co';
+const supabaseAnonKey = 'sb_publishable_hJJu5Ytx26zgGbHhCLmh5A_aVIHoK6d';
+
+let supabaseClient = null;
+
+if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+  try {
+    supabaseClient = supabase.createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+  } catch (e) {
+    console.error('Erro ao iniciar o Supabase:', e);
+  }
+}
 
     if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
       try { supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey); } catch(e){}
@@ -214,18 +234,43 @@
     }
 
     async function loadAdminPhotos() {
-      const dbBadge = document.getElementById('dbStatusBadge');
+  const dbBadge = document.getElementById('dbStatusBadge');
 
-      if (supabaseClient) {
-        dbBadge.textContent = 'Supabase Nuvem';
-        dbBadge.className = 'text-xs font-medium text-emerald-400 mt-0.5';
-        const { data, error } = await supabaseClient.from('photos').select('*').order('created_at', { ascending: false });
-        if (!error && data) {
-          adminPhotos = data;
-          renderAdminTable();
-          return;
-        }
-      }
+  if (!supabaseClient) {
+    dbBadge.textContent = 'Supabase indisponível';
+    dbBadge.className = 'text-xs font-medium text-rose-400 mt-0.5';
+
+    adminPhotos = [];
+    renderAdminTable();
+    return;
+  }
+
+  dbBadge.textContent = 'Supabase Nuvem';
+  dbBadge.className = 'text-xs font-medium text-emerald-400 mt-0.5';
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('photos')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    adminPhotos = data || [];
+    renderAdminTable();
+
+  } catch (error) {
+    console.error('Erro ao carregar fotos:', error);
+
+    dbBadge.textContent = 'Erro no Banco';
+    dbBadge.className = 'text-xs font-medium text-rose-400 mt-0.5';
+
+    adminPhotos = [];
+    renderAdminTable();
+  }
+}
 
       dbBadge.textContent = 'Armazenamento Local';
       dbBadge.className = 'text-xs font-medium text-amber-400 mt-0.5';
@@ -265,19 +310,68 @@
     }
 
     async function deletePhotoByAdmin(photoId) {
-      if (!confirm('Deseja realmente apagar esta foto do mural permanentemente?')) return;
+  if (!confirm('Deseja realmente apagar esta foto do mural permanentemente?')) {
+    return;
+  }
 
-      const p = adminPhotos.find(item => item.id === photoId);
+  const p = adminPhotos.find(item => item.id === photoId);
 
-      if (supabaseClient) {
-        if (p && p.image_url && p.image_url.includes('/memories/')) {
-          try {
-            const fileName = p.image_url.split('/memories/')[1];
-            if (fileName) await supabaseClient.storage.from('memories').remove([fileName]);
-          } catch(e){}
+  if (!p) {
+    alert('Foto não encontrada.');
+    return;
+  }
+
+  if (!supabaseClient) {
+    alert('O banco de dados não está conectado.');
+    return;
+  }
+
+  try {
+    // Remove a foto da tabela
+    const { error: dbError } = await supabaseClient
+      .from('photos')
+      .delete()
+      .eq('id', photoId);
+
+    if (dbError) {
+      throw dbError;
+    }
+
+    // Remove o arquivo do Storage
+    const marker = '/storage/v1/object/public/memories/';
+    const position = (p.image_url || '').indexOf(marker);
+
+    if (position !== -1) {
+      const objectPath = decodeURIComponent(
+        p.image_url
+          .slice(position + marker.length)
+          .split('?')[0]
+      );
+
+      if (objectPath) {
+        const { error: storageError } = await supabaseClient
+          .storage
+          .from('memories')
+          .remove([objectPath]);
+
+        if (storageError) {
+          console.warn(
+            'A foto foi removida do banco, mas o arquivo não pôde ser removido do Storage:',
+            storageError
+          );
         }
-        await supabaseClient.from('photos').delete().eq('id', photoId);
       }
+    }
+
+    adminPhotos = adminPhotos.filter(item => item.id !== photoId);
+
+    renderAdminTable();
+
+  } catch (error) {
+    console.error('Erro ao excluir a foto:', error);
+    alert('Não foi possível excluir a foto. Verifique as permissões do Supabase e tente novamente.');
+  }
+}
 
       adminPhotos = adminPhotos.filter(item => item.id !== photoId);
       localStorage.setItem('duda15_photos', JSON.stringify(adminPhotos));
