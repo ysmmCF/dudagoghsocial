@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>Eduarda 15 Anos | Mural de Memórias</title>
+  <title>Eduarda 15 Anos | Mural de fotos</title>
 
   <!-- Google Fonts: Playfair Display & Outfit -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -180,16 +180,25 @@
     </div>
   </div>
 
-  <!-- Identificação única do convidado, exibida depois da abertura. -->
+  <!-- Conta persistente do convidado, exibida depois da abertura quando necessário. -->
   <div id="identityOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/85 backdrop-blur-xl">
     <section class="w-full max-w-sm glass-panel rounded-3xl p-7 sm:p-8 border border-amber-500/25 shadow-2xl text-center">
       <p class="text-[10px] text-amber-300/70 uppercase tracking-[0.22em] mb-3">Uma noite para guardar</p>
       <h2 class="font-serif text-2xl text-slate-100 mb-2">Bem-vindo à noite da Eduarda</h2>
-      <p class="text-xs text-slate-300 font-light leading-relaxed mb-7">Como devemos te chamar?</p>
-      <form onsubmit="saveGuestName(event)" class="space-y-4">
+      <p id="accountSubtitle" class="text-xs text-slate-300 font-light leading-relaxed mb-6">Crie seu perfil para guardar suas memórias.</p>
+      <form onsubmit="submitAccount(event)" class="space-y-3">
         <input id="welcomeNameInput" type="text" required maxlength="40" autocomplete="name" placeholder="Seu nome" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
-        <button type="submit" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">Continuar</button>
+        <input id="accountEmail" type="email" required autocomplete="email" placeholder="Seu e-mail" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <input id="accountPassword" type="password" required minlength="6" autocomplete="new-password" placeholder="Crie uma senha (mínimo 6 caracteres)" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <p id="accountMessage" class="hidden text-xs leading-relaxed"></p>
+        <button id="accountSubmit" type="submit" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">Criar meu perfil</button>
       </form>
+      <div class="flex items-center gap-3 my-5"><span class="h-px flex-1 bg-slate-700/70"></span><span class="text-[10px] uppercase tracking-widest text-slate-500">ou</span><span class="h-px flex-1 bg-slate-700/70"></span></div>
+      <button onclick="signInWithGoogle()" class="w-full py-3 rounded-xl bg-white text-slate-800 text-xs font-semibold shadow-lg touch-target flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.39-.18-2.05H12v3.87h5.24a4.48 4.48 0 01-1.94 2.94v2.51h3.14c1.84-1.69 2.91-4.19 2.91-7.27z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.35l-3.14-2.51c-.87.58-1.99.92-3.31.92-2.54 0-4.7-1.72-5.47-4.02H3.3v2.59A9.75 9.75 0 0012 21.75z"/><path fill="#FBBC05" d="M6.53 13.79A5.87 5.87 0 016.23 12c0-.62.11-1.22.3-1.79V7.62H3.3A9.75 9.75 0 002.25 12c0 1.57.38 3.05 1.05 4.38l3.23-2.59z"/><path fill="#EA4335" d="M12 6.19c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.28 14.63 2.25 12 2.25A9.75 9.75 0 003.3 7.62l3.23 2.59C7.3 7.91 9.46 6.19 12 6.19z"/></svg>
+        Continuar com Google
+      </button>
+      <button id="accountModeButton" onclick="toggleAccountMode()" class="mt-5 text-xs text-amber-200/75 hover:text-amber-100 underline underline-offset-4">Já tenho um perfil</button>
     </section>
   </div>
 
@@ -226,9 +235,8 @@
   <!-- Main Section -->
   <main class="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-6 pt-4 pb-12 z-10 relative">
 
-    <!-- Barra compacta estilo rede social -->
-    <div class="flex items-center justify-between mb-4 px-1">
-      <!-- Contador compacto -->
+    <!-- Contador discreto: os filtros ficam na barra inferior, como em um app mobile. -->
+    <div class="flex items-center mb-4 px-1">
       <div class="flex items-center gap-2">
         <span class="text-amber-400/80 text-sm">
           <svg class="w-4 h-4 inline-block mr-1 fill-amber-400/20 stroke-amber-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,13 +247,26 @@
         </span>
       </div>
 
-      <!-- Filtros compactos -->
-      <div class="flex items-center gap-1 p-0.5 rounded-full bg-slate-950/80 border border-amber-500/15">
-        <button id="tabRecent" onclick="setSortMode('recent')" class="px-3 py-1 rounded-full text-xs font-medium gold-button transition-all">Recentes</button>
-        <button id="tabHighlights" onclick="setSortMode('highlights')" class="px-3 py-1 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">Destaques</button>
-        <button id="tabMyPhotos" onclick="setSortMode('my-photos')" class="px-3 py-1 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">Minhas</button>
-      </div>
     </div>
+
+    <!-- Perfil: aparece somente em Minhas, antes da grade de fotos. -->
+    <section id="myProfile" class="hidden mb-5 rounded-2xl glass-card p-4">
+      <div class="flex items-center gap-4">
+        <label class="relative block w-16 h-16 shrink-0 cursor-pointer">
+          <div id="profileAvatar" class="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/35 flex items-center justify-center font-serif text-xl text-white"></div>
+          <span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-slate-950 border-2 border-slate-950 flex items-center justify-center">+</span>
+          <input id="profilePhotoInput" type="file" accept="image/*" class="hidden" onchange="handleProfilePhoto(event)" />
+        </label>
+        <div class="min-w-0 flex-1">
+          <p class="text-[10px] uppercase tracking-widest text-amber-200/55 mb-1">Meu perfil</p>
+          <div class="flex gap-2">
+            <input id="profileNameInput" type="text" maxlength="40" class="min-w-0 flex-1 bg-slate-950/65 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-slate-100 outline-none focus:border-amber-400" />
+            <button onclick="saveProfile()" class="px-3 rounded-lg gold-button text-xs font-semibold">Salvar</button>
+          </div>
+          <p id="profilePhotoCount" class="mt-2 text-[11px] text-slate-400"></p>
+        </div>
+      </div>
+    </section>
 
     <!-- Feed -->
     <div id="photoFeed" class="flex flex-col gap-5"></div>
@@ -268,21 +289,21 @@
   <!-- ==============================================================================
        BARRA DE NAVEGAÇÃO INFERIOR PARA CELULARES (MOBILE BOTTOM NAVIGATION BAR)
        ============================================================================== -->
-  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 sm:hidden glass-panel border-t border-amber-500/20 px-2 py-1.5 flex items-center justify-around shadow-2xl">
-    <!-- Tab 1: Mural Geral -->
-    <button id="navMural" onclick="setSortMode('recent')" class="flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors">
+  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 sm:hidden glass-panel border-t border-amber-500/20 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] grid grid-cols-4 items-end shadow-2xl">
+    <!-- Tab 1: Recentes -->
+    <button id="navMural" onclick="setSortMode('recent')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m4-2a8 8 0 11-16 0 8 8 0 0116 0z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Mural</span>
+      <span class="text-[10px] font-medium">Recentes</span>
     </button>
 
     <!-- Tab 2: Destaques -->
-    <button id="navDestaques" onclick="setSortMode('highlights')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+    <button id="navDestaques" onclick="setSortMode('highlights')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Destaques</span>
+      <span class="text-[10px] font-medium">Destaques</span>
     </button>
 
     <!-- Tab 3: Publicar Foto (Central Highlight Button) -->
@@ -296,11 +317,11 @@
     </button>
 
     <!-- Tab 4: Minhas Fotos -->
-    <button id="navMinhas" onclick="setSortMode('my-photos')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+    <button id="navMinhas" onclick="setSortMode('my-photos')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Minhas Fotos</span>
+      <span class="text-[10px] font-medium">Minhas</span>
     </button>
 
   </nav>
@@ -391,10 +412,12 @@
   <script>
     let photosList = [];
     let sortMode = 'recent';
-    let currentSessionId = localStorage.getItem('duda15_session') || ('guest_' + Math.random().toString(36).substring(2, 11));
-    localStorage.setItem('duda15_session', currentSessionId);
+    let currentSessionId = localStorage.getItem('duda15_session') || null;
     // Persistência leve do convidado: só nome e identificador; fotos ficam no Storage.
     let rememberedAuthor = localStorage.getItem('duda15_author') || '';
+    let profilePhoto = localStorage.getItem('duda15_profile_photo') || '';
+    let accountMode = 'signup';
+    let accountReady = false;
 
     // ==========================================================
     // CONFIGURAÇÃO DO SUPABASE
@@ -404,19 +427,33 @@
     // ==========================================================
 
     let supabaseClient = null;
-    if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
-      try { supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey); } catch (e) {}
-    }
 
+if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+  try {
+    supabaseClient = supabase.createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+  } catch (e) {
+    console.error('Erro ao iniciar o Supabase:', e);
+  }
+}
 
-
+    
     function dismissEntrance() {
       const overlay = document.getElementById('entranceOverlay');
       if (overlay) {
         overlay.style.opacity = '0';
         setTimeout(() => {
           overlay.remove();
-          showIdentityIfNeeded();
+          initializeAccount();
         }, 1000);
       }
     }
@@ -425,20 +462,114 @@
     setTimeout(dismissEntrance, 3200);
 
     function showIdentityIfNeeded() {
-      if (rememberedAuthor) return;
+      if (accountReady) return;
       const identityOverlay = document.getElementById('identityOverlay');
       identityOverlay.classList.remove('hidden');
       setTimeout(() => document.getElementById('welcomeNameInput').focus(), 80);
     }
 
-    function saveGuestName(event) {
-      event.preventDefault();
-      const name = document.getElementById('welcomeNameInput').value.trim();
-      if (!name) return;
-      rememberedAuthor = name;
-      localStorage.setItem('duda15_author', name);
-      document.getElementById('identityOverlay').classList.add('hidden');
+    async function initializeAccount() {
+  if (!supabaseClient) {
+    showIdentityIfNeeded();
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error('Erro ao recuperar sessão:', error);
+    showIdentityIfNeeded();
+    return;
+  }
+
+  if (data.session) {
+    setAccountSession(data.session.user);
+  } else {
+    showIdentityIfNeeded();
+  }
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      setAccountSession(session.user);
+    } else {
+      accountReady = false;
+      currentSessionId = null;
+      showIdentityIfNeeded();
     }
+  });
+}
+
+    function setAccountSession(user) {
+      accountReady = true;
+      currentSessionId = user.id;
+      localStorage.setItem('duda15_session', currentSessionId);
+      const metadata = user.user_metadata || {};
+      const savedName = metadata.display_name || metadata.full_name || metadata.name || (user.email || '').split('@')[0];
+      if (savedName) { rememberedAuthor = savedName; localStorage.setItem('duda15_author', savedName); }
+      document.getElementById('identityOverlay').classList.add('hidden');
+      loadPhotos();
+    }
+
+    function toggleAccountMode() {
+      accountMode = accountMode === 'signup' ? 'signin' : 'signup';
+      const signup = accountMode === 'signup';
+      const name = document.getElementById('welcomeNameInput');
+      const password = document.getElementById('accountPassword');
+      name.classList.toggle('hidden', !signup);
+      name.required = signup;
+      password.autocomplete = signup ? 'new-password' : 'current-password';
+      password.placeholder = signup ? 'Crie uma senha (mínimo 6 caracteres)' : 'Sua senha';
+      document.getElementById('accountSubtitle').textContent = signup ? 'Crie seu perfil para guardar suas memórias.' : 'Entre para acessar o perfil que você já criou.';
+      document.getElementById('accountSubmit').textContent = signup ? 'Criar meu perfil' : 'Entrar no meu perfil';
+      document.getElementById('accountModeButton').textContent = signup ? 'Já tenho um perfil' : 'Ainda não tenho perfil';
+      document.getElementById('accountMessage').classList.add('hidden');
+    }
+
+    async function submitAccount(event) {
+      event.preventDefault();
+      if (!supabaseClient) { alert('O serviço de contas não está disponível.'); return; }
+      const email = document.getElementById('accountEmail').value.trim();
+      const password = document.getElementById('accountPassword').value;
+      const name = document.getElementById('welcomeNameInput').value.trim();
+      const button = document.getElementById('accountSubmit');
+      const message = document.getElementById('accountMessage');
+      button.disabled = true; button.textContent = 'Aguarde...';
+      let result;
+      if (accountMode === 'signup') {
+        result = await supabaseClient.auth.signUp({ email, password, options: { data: { display_name: name } } });
+      } else {
+        result = await supabaseClient.auth.signInWithPassword({ email, password });
+      }
+      button.disabled = false; button.textContent = accountMode === 'signup' ? 'Criar meu perfil' : 'Entrar no meu perfil';
+      if (result.error) { message.textContent = result.error.message; message.className = 'text-xs leading-relaxed text-rose-300'; return; }
+      if (result.data.session) { setAccountSession(result.data.session.user); return; }
+      message.textContent = 'Perfil criado. Confirme o e-mail recebido e depois entre com sua conta.';
+      message.className = 'text-xs leading-relaxed text-amber-200';
+    }
+
+    async function signInWithGoogle() {
+  if (!supabaseClient) {
+    alert('O serviço de contas não está disponível.');
+    return;
+  }
+
+  const message = document.getElementById('accountMessage');
+
+  const redirectTo = 'https://ysmmcf.github.io/dudagoghsocial/';
+
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectTo
+    }
+  });
+
+  if (error) {
+    console.error('Erro no login com Google:', error);
+    message.textContent = error.message;
+    message.className = 'text-xs leading-relaxed text-rose-300';
+  }
+}
 
     function initStarryCanvas() {
       const canvas = document.getElementById('starryCanvas');
@@ -500,6 +631,54 @@
       localStorage.setItem('duda15_photos', JSON.stringify(photosList));
     }
 
+    function renderProfile() {
+      const panel = document.getElementById('myProfile');
+      const mine = photosList.filter(p => p.session_id === currentSessionId);
+      panel.classList.toggle('hidden', sortMode !== 'my-photos');
+      if (sortMode !== 'my-photos') return;
+      document.getElementById('profileNameInput').value = rememberedAuthor;
+      document.getElementById('profilePhotoCount').textContent = `${mine.length} ${mine.length === 1 ? 'foto compartilhada' : 'fotos compartilhadas'}`;
+      const avatar = document.getElementById('profileAvatar');
+      avatar.innerHTML = profilePhoto
+        ? `<img src="${profilePhoto}" alt="Foto de perfil" class="w-full h-full object-cover">`
+        : escapeHtml((rememberedAuthor || 'E')[0].toUpperCase());
+    }
+
+    function handleProfilePhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        profilePhoto = reader.result;
+        localStorage.setItem('duda15_profile_photo', profilePhoto);
+        renderProfile();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveProfile() {
+      const nextName = document.getElementById('profileNameInput').value.trim();
+      if (!nextName) { alert('Informe seu nome.'); return; }
+      const previousName = rememberedAuthor;
+      rememberedAuthor = nextName;
+      localStorage.setItem('duda15_author', nextName);
+      photosList.forEach(p => { if (p.session_id === currentSessionId) p.author = nextName; });
+      renderProfile();
+      renderFeed();
+      if (supabaseClient) {
+        await supabaseClient.auth.updateUser({ data: { display_name: nextName } });
+        const { error } = await supabaseClient.from('photos').update({ author: nextName }).eq('session_id', currentSessionId);
+        if (error) {
+          rememberedAuthor = previousName;
+          localStorage.setItem('duda15_author', previousName);
+          await loadPhotos();
+          alert('O nome foi salvo apenas neste aparelho. Não foi possível atualizar as fotos já publicadas.');
+        }
+      } else {
+        saveLocalPhotos();
+      }
+    }
+
     function renderFeed() {
       const feedEl = document.getElementById('photoFeed');
       const emptyEl = document.getElementById('emptyState');
@@ -507,6 +686,8 @@
       const feedTitleEl = document.getElementById('feedTitle');
 
       counterEl.textContent = photosList.length;
+      feedEl.className = sortMode === 'my-photos' ? 'grid grid-cols-3 gap-1.5' : 'flex flex-col gap-5';
+      renderProfile();
 
       let displayed = [...photosList];
 
@@ -548,6 +729,16 @@
         const isMyPhoto = p.session_id === currentSessionId;
         const timeStr = formatTimeAgo(p.created_at);
         const initial = (p.author || 'C')[0].toUpperCase();
+
+        if (sortMode === 'my-photos') {
+          return `
+            <article class="relative aspect-square overflow-hidden rounded-lg bg-black group">
+              <img onclick="openLightbox('${p.id}')" src="${p.image_url}" alt="Minha foto" loading="lazy" class="w-full h-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105" />
+              <button onclick="deletePhoto('${p.id}')" class="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-slate-950/80 text-rose-200 border border-rose-300/25 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" aria-label="Excluir minha foto">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7h12m-8 4v6m4-6v6M9 7l1-2h4l1 2m-7 0 .5 13h7L16 7" /></svg>
+              </button>
+            </article>`;
+        }
 
         return `
           <article class="glass-card rounded-2xl overflow-hidden group">
@@ -600,6 +791,10 @@
     }
 
     async function toggleLike(photoId) {
+      if (!accountReady || !currentSessionId) {
+  showIdentityIfNeeded();
+  return;
+}
       const p = photosList.find(item => item.id === photoId);
       if (!p) return;
 
@@ -706,6 +901,10 @@
 
     async function handleUploadSubmit(e) {
       e.preventDefault();
+      if (!accountReady || !currentSessionId) {
+  showIdentityIfNeeded();
+  return;
+}
       if (!selectedCompressedFile) {
         alert('Selecione uma foto para publicar.');
         return;
@@ -780,7 +979,7 @@
     }
 
     function openUploadModal() {
-      if (!rememberedAuthor) {
+      if (!accountReady || !rememberedAuthor) {
         showIdentityIfNeeded();
         return;
       }
@@ -807,32 +1006,18 @@
     function setSortMode(mode) {
       sortMode = mode;
 
-      // Update Desktop Tabs
-      ['tabRecent', 'tabHighlights', 'tabMyPhotos'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all';
-      });
-
-      if (mode === 'recent') {
-        const el = document.getElementById('tabRecent'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
-      } else if (mode === 'highlights') {
-        const el = document.getElementById('tabHighlights'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
-      } else if (mode === 'my-photos') {
-        const el = document.getElementById('tabMyPhotos'); if (el) el.className = 'px-3.5 py-1.5 rounded-full text-xs font-medium gold-button transition-all';
-      }
-
-      // Update Mobile Bottom Nav Colors
+      // Atualiza a navegação inferior mobile.
       ['navMural', 'navDestaques', 'navMinhas'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors';
+        if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors';
       });
 
       if (mode === 'recent') {
-        const el = document.getElementById('navMural'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+        const el = document.getElementById('navMural'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
       } else if (mode === 'highlights') {
-        const el = document.getElementById('navDestaques'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+        const el = document.getElementById('navDestaques'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
       } else if (mode === 'my-photos') {
-        const el = document.getElementById('navMinhas'); if (el) el.className = 'flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors';
+        const el = document.getElementById('navMinhas'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
       }
 
       renderFeed();
@@ -852,9 +1037,8 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      initStarryCanvas();
-      loadPhotos();
-    });
+  initStarryCanvas();
+});
   </script>
 </body>
 </html>
