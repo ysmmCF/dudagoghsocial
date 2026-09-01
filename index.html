@@ -668,7 +668,10 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
       renderFeed();
       if (supabaseClient) {
         await supabaseClient.auth.updateUser({ data: { display_name: nextName } });
-        const { error } = await supabaseClient.from('photos').update({ author: nextName }).eq('session_id', currentSessionId);
+        const { error } = await supabaseClient.from('photos').update({
+  author: nextName,
+  profile_photo: profilePhoto || ''
+}).eq('session_id', currentSessionId);
         if (error) {
           rememberedAuthor = previousName;
           localStorage.setItem('duda15_author', previousName);
@@ -745,9 +748,13 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
           <article class="glass-card rounded-2xl overflow-hidden group">
             <!-- Cabeçalho do post (estilo rede social) -->
             <div class="flex items-center gap-3 px-4 py-3">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-500/30 flex items-center justify-center text-slate-100 text-sm font-bold shrink-0">
-                ${initial}
-              </div>
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-500/30 flex items-center justify-center text-slate-100 text-sm font-bold shrink-0 overflow-hidden">
+  ${
+    p.profile_photo
+      ? `<img src="${p.profile_photo}" alt="Foto de perfil" class="w-full h-full object-cover" />`
+      : initial
+  }
+</div>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(p.author || 'Convidado Especial')}</span>
@@ -938,13 +945,14 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
           }
 
           const { data: dbData, error: dbErr } = await supabaseClient.from('photos').insert([{
-            image_url: imageUrl,
-            author: author,
-            caption: caption,
-            likes_count: 0,
-            liked_by: [],
-            session_id: currentSessionId
-          }]).select().single();
+  image_url: imageUrl,
+  author: author,
+  caption: caption,
+  likes_count: 0,
+  liked_by: [],
+  session_id: currentSessionId,
+  profile_photo: profilePhoto || ''
+}]).select().single();
 
           if (!dbErr && dbData) {
             photosList.unshift(dbData);
