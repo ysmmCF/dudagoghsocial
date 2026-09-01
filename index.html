@@ -545,6 +545,7 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
       if (result.data.session) { setAccountSession(result.data.session.user); return; }
       message.textContent = 'Perfil criado. Confirme o e-mail recebido e depois entre com sua conta.';
       message.className = 'text-xs leading-relaxed text-amber-200';
+      message.textContent = '';
     }
 
     async function signInWithGoogle() {
