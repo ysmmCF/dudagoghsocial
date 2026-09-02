@@ -269,7 +269,92 @@
     </section>
 
     <!-- Feed -->
-    <div id="photoFeed" class="flex flex-col gap-5"></div>
+    <!-- PESQUISA DE CONVIDADOS -->
+<div class="mb-4 relative">
+
+  <div class="relative">
+
+    <svg
+      class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.8"
+        d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+      />
+    </svg>
+
+    <input
+      id="guestSearchInput"
+      type="text"
+      placeholder="Pesquisar convidado..."
+      autocomplete="off"
+      oninput="searchGuests()"
+      class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-950/65 border border-slate-800 text-slate-100 text-sm outline-none focus:border-amber-400 transition-colors"
+    >
+
+  </div>
+
+  <div
+    id="guestSearchResults"
+    class="hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl glass-panel border border-amber-500/20 shadow-2xl overflow-hidden"
+  ></div>
+
+</div>
+
+<!-- Feed -->
+<div id="photoFeed" class="flex flex-col gap-5"></div>
+    <!-- PERFIL PÚBLICO DO CONVIDADO -->
+<div id="publicProfileModal" class="hidden fixed inset-0 z-[80] bg-slate-950/90 backdrop-blur-sm p-4 overflow-y-auto">
+  <div class="min-h-full flex items-center justify-center">
+    <div class="w-full max-w-lg rounded-3xl glass-panel border border-amber-500/20 shadow-2xl overflow-hidden">
+
+      <div class="flex items-center justify-between px-5 py-4 border-b border-amber-500/10">
+        <h2 class="font-serif text-lg text-slate-100">Perfil do convidado</h2>
+
+        <button
+          onclick="closePublicProfile()"
+          class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center"
+          aria-label="Fechar perfil"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5">
+
+        <div class="flex items-center gap-4 mb-6">
+          <div
+            id="publicProfileAvatar"
+            class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/30 flex items-center justify-center text-white text-2xl font-bold shrink-0"
+          ></div>
+
+          <div class="min-w-0">
+            <h3
+              id="publicProfileName"
+              class="text-lg font-semibold text-slate-100 truncate"
+            ></h3>
+
+            <p
+              id="publicProfileCount"
+              class="text-xs text-slate-400 mt-1"
+            ></p>
+          </div>
+        </div>
+
+        <div
+          id="publicProfilePhotos"
+          class="grid grid-cols-3 gap-1.5"
+        ></div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Empty State -->
     <div id="emptyState" class="hidden max-w-md mx-auto my-8 p-6 sm:p-8 rounded-3xl glass-panel text-center border border-amber-500/20 shadow-2xl">
@@ -386,6 +471,61 @@
 
   <!-- Lightbox Modal -->
   <div id="lightboxModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <!-- Modal para editar legenda -->
+<div
+  id="editCaptionModal"
+  class="hidden fixed inset-0 z-[90] bg-slate-950/90 backdrop-blur-sm p-4"
+>
+  <div class="min-h-full flex items-center justify-center">
+
+    <div class="w-full max-w-md rounded-3xl glass-panel border border-amber-500/20 shadow-2xl p-5">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <h2 class="font-serif text-lg text-slate-100">
+          Editar legenda
+        </h2>
+
+        <button
+          onclick="closeEditCaption()"
+          class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center hover:text-white transition-colors"
+          aria-label="Fechar"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <textarea
+        id="editCaptionInput"
+        maxlength="300"
+        rows="4"
+        placeholder="Escreva uma legenda..."
+        class="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-100 text-sm outline-none resize-none focus:border-amber-400"
+      ></textarea>
+
+      <div class="flex gap-2 mt-4">
+
+        <button
+          onclick="closeEditCaption()"
+          class="flex-1 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold"
+        >
+          Cancelar
+        </button>
+
+        <button
+          onclick="saveEditedCaption()"
+          class="flex-1 py-3 rounded-xl gold-button text-xs font-semibold"
+        >
+          Salvar legenda
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
     <div onclick="closeLightbox()" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl"></div>
     <div class="relative max-w-4xl w-full glass-panel rounded-3xl overflow-hidden border border-amber-500/30 shadow-2xl z-10 flex flex-col md:flex-row my-auto max-h-[92vh]">
       <button onclick="closeLightbox()" class="absolute top-3 right-3 z-20 p-2 rounded-full bg-slate-950/80 border border-slate-700 text-slate-300 hover:text-white touch-target">
@@ -411,8 +551,9 @@
 
   <script>
     let photosList = [];
-    let sortMode = 'recent';
-    let currentSessionId = localStorage.getItem('duda15_session') || null;
+let sortMode = 'recent';
+let editingCaptionPhotoId = null;
+let currentSessionId = localStorage.getItem('duda15_session') || null;
     // Persistência leve do convidado: só nome e identificador; fotos ficam no Storage.
     let rememberedAuthor = localStorage.getItem('duda15_author') || '';
     let profilePhoto = localStorage.getItem('duda15_profile_photo') || '';
@@ -458,8 +599,8 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
       }
     }
 
-    // Auto-dismiss após 3.2s (splash screen automática)
-    setTimeout(dismissEntrance, 3200);
+    // Auto-dismiss após 2.2s (splash screen automática)
+    setTimeout(dismissEntrance, 2200);
 
     function showIdentityIfNeeded() {
       if (accountReady) return;
@@ -748,21 +889,39 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
           <article class="glass-card rounded-2xl overflow-hidden group">
             <!-- Cabeçalho do post (estilo rede social) -->
             <div class="flex items-center gap-3 px-4 py-3">
-              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-500/30 flex items-center justify-center text-slate-100 text-sm font-bold shrink-0 overflow-hidden">
-  ${
-    p.profile_photo
-      ? `<img src="${p.profile_photo}" alt="Foto de perfil" class="w-full h-full object-cover" />`
-      : initial
-  }
+
+  <button
+    onclick="openPublicProfile('${p.session_id}')"
+    class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-500/30 flex items-center justify-center text-slate-100 text-sm font-bold shrink-0 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+    aria-label="Abrir perfil de ${escapeHtml(p.author || 'Convidado Especial')}"
+  >
+    ${
+      p.profile_photo
+        ? `<img src="${p.profile_photo}" alt="Foto de perfil" class="w-full h-full object-cover" />`
+        : initial
+    }
+  </button>
+
+  <div class="flex-1 min-w-0">
+
+    <div class="flex items-center gap-2 flex-wrap">
+
+      <button
+        onclick="openPublicProfile('${p.session_id}')"
+        class="text-sm font-semibold text-slate-100 truncate hover:text-amber-300 transition-colors"
+      >
+        ${escapeHtml(p.author || 'Convidado Especial')}
+      </button>
+
+      ${isMyPhoto ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 font-medium">você</span>' : ''}
+
+    </div>
+
+    <p class="text-[11px] text-amber-200/50">${timeStr}</p>
+
+  </div>
+
 </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="text-sm font-semibold text-slate-100 truncate">${escapeHtml(p.author || 'Convidado Especial')}</span>
-                  ${isMyPhoto ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 font-medium">você</span>' : ''}
-                </div>
-                <p class="text-[11px] text-amber-200/50">${timeStr}</p>
-              </div>
-            </div>
 
             <!-- Foto (clicável para lightbox) -->
             <div onclick="openLightbox('${p.id}')" class="relative w-full aspect-square bg-black overflow-hidden cursor-pointer">
@@ -778,13 +937,61 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
                 </button>
-                ${isMyPhoto ? `
-                  <button onclick="deletePhoto('${p.id}')" class="ml-auto flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-300 transition-colors" aria-label="Excluir minha foto">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M4.772 5.79a48.108 48.108 0 011.022-.165m0 0a48.11 48.11 0 0114.412 0M6.75 5.625V4.5A2.25 2.25 0 019 2.25h6a2.25 2.25 0 012.25 2.25v1.125m-10.5 0h10.5M5.25 5.625h13.5l-.55 14.3a2.25 2.25 0 01-2.248 2.075H8.048A2.25 2.25 0 015.8 19.925L5.25 5.625z" />
-                    </svg>
-                    Excluir
-                  </button>` : ''}
+               ${isMyPhoto ? `
+  <div class="ml-auto flex items-center gap-1">
+
+    <!-- Editar legenda -->
+    <button
+      onclick="openEditCaption('${p.id}')"
+      class="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-amber-300 transition-colors"
+      aria-label="Editar legenda"
+    >
+
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"
+        />
+      </svg>
+
+      Editar
+
+    </button>
+
+    <!-- Excluir foto -->
+    <button
+      onclick="deletePhoto('${p.id}')"
+      class="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-300 transition-colors"
+      aria-label="Excluir minha foto"
+    >
+
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M4.772 5.79a48.108 48.108 0 0 1 1.022-.165m0 0a48.11 48.11 0 0 1 14.412 0M6.75 5.625V4.5A2.25 2.25 0 0 1 9 2.25h6a2.25 2.25 0 0 1 2.25 2.25v1.125m-10.5 0h10.5M5.25 5.625h13.5l-.55 14.3a2.25 2.25 0 0 1-2.248 2.075H8.048A2.25 2.25 0 0 1 5.8 19.925L5.25 5.625z"
+        />
+      </svg>
+
+      Excluir
+
+    </button>
+
+  </div>
+` : ''}
               </div>
 
               <!-- Contagem de curtidas -->
@@ -1011,6 +1218,167 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
       document.getElementById('lightboxModal').classList.remove('hidden');
     }
     function closeLightbox() { document.getElementById('lightboxModal').classList.add('hidden'); }
+    function openEditCaption(photoId) {
+  const photo = photosList.find(p => p.id === photoId);
+
+  if (!photo) return;
+
+  // Só o dono da foto pode editar a legenda
+  if (photo.session_id !== currentSessionId) {
+    return;
+  }
+
+  editingCaptionPhotoId = photoId;
+
+  const input = document.getElementById('editCaptionInput');
+
+  input.value = photo.caption || '';
+
+  document
+    .getElementById('editCaptionModal')
+    .classList.remove('hidden');
+
+  setTimeout(() => {
+    input.focus();
+    input.setSelectionRange(
+      input.value.length,
+      input.value.length
+    );
+  }, 100);
+}
+
+
+function closeEditCaption() {
+  editingCaptionPhotoId = null;
+
+  document
+    .getElementById('editCaptionModal')
+    .classList.add('hidden');
+}
+
+
+async function saveEditedCaption() {
+  if (!editingCaptionPhotoId) return;
+
+  const photo = photosList.find(
+    p => p.id === editingCaptionPhotoId
+  );
+
+  if (!photo) {
+    closeEditCaption();
+    return;
+  }
+
+  // Só o dono da foto pode alterar
+  if (photo.session_id !== currentSessionId) {
+    closeEditCaption();
+    return;
+  }
+
+  const input =
+    document.getElementById('editCaptionInput');
+
+  const newCaption =
+    input.value.trim();
+
+  const previousCaption =
+    photo.caption || '';
+
+  // Atualiza a legenda na tela
+  photo.caption = newCaption;
+
+  renderFeed();
+
+  // Salva no Supabase
+  if (supabaseClient) {
+
+    const { error } =
+      await supabaseClient
+        .from('photos')
+        .update({
+          caption: newCaption
+        })
+        .eq('id', editingCaptionPhotoId)
+        .eq('session_id', currentSessionId);
+
+    if (error) {
+
+      console.error(
+        'Erro ao editar legenda:',
+        error
+      );
+
+      // Restaura a legenda anterior se der erro
+      photo.caption = previousCaption;
+
+      renderFeed();
+
+      alert(
+        'Não foi possível salvar a legenda. Tente novamente.'
+      );
+
+      return;
+    }
+
+  } else {
+
+    saveLocalPhotos();
+
+  }
+
+  closeEditCaption();
+}
+    function openPublicProfile(sessionId) {
+  const userPhotos = photosList.filter(p => p.session_id === sessionId);
+
+  if (!userPhotos.length) return;
+
+  const firstPhoto = userPhotos.find(p => p.profile_photo) || userPhotos[0];
+
+  const name = firstPhoto.author || 'Convidado Especial';
+  const photo = firstPhoto.profile_photo || '';
+
+  document.getElementById('publicProfileName').textContent = name;
+
+  document.getElementById('publicProfileCount').textContent =
+    `${userPhotos.length} ${userPhotos.length === 1 ? 'foto compartilhada' : 'fotos compartilhadas'}`;
+
+  const avatar = document.getElementById('publicProfileAvatar');
+
+  if (photo) {
+    avatar.innerHTML = `
+      <img
+        src="${photo}"
+        alt="Foto de perfil"
+        class="w-full h-full object-cover"
+      >
+    `;
+  } else {
+    avatar.textContent = (name || 'C')[0].toUpperCase();
+  }
+
+  const photosContainer = document.getElementById('publicProfilePhotos');
+
+  photosContainer.innerHTML = userPhotos.map(p => `
+    <button
+      onclick="closePublicProfile(); openLightbox('${p.id}')"
+      class="aspect-square overflow-hidden rounded-lg bg-black group"
+    >
+      <img
+        src="${p.image_url}"
+        alt="Foto de ${escapeHtml(name)}"
+        loading="lazy"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      >
+    </button>
+  `).join('');
+
+  document.getElementById('publicProfileModal').classList.remove('hidden');
+}
+
+function closePublicProfile() {
+  document.getElementById('publicProfileModal').classList.add('hidden');
+}
 
     function setSortMode(mode) {
       sortMode = mode;
@@ -1031,6 +1399,108 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
 
       renderFeed();
     }
+    function searchGuests() {
+  const input = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (!input || !results) return;
+
+  const term = input.value.trim().toLowerCase();
+
+  if (!term) {
+    results.innerHTML = '';
+    results.classList.add('hidden');
+    return;
+  }
+
+  const guestsMap = new Map();
+
+  photosList.forEach(p => {
+    if (!p.session_id) return;
+
+    const name = p.author || 'Convidado Especial';
+
+    if (name.toLowerCase().includes(term)) {
+      if (!guestsMap.has(p.session_id)) {
+        guestsMap.set(p.session_id, p);
+      }
+    }
+  });
+
+  const guests = [...guestsMap.values()];
+
+  if (!guests.length) {
+    results.innerHTML = `
+      <div class="px-4 py-4 text-sm text-slate-400 text-center">
+        Nenhum convidado encontrado.
+      </div>
+    `;
+
+    results.classList.remove('hidden');
+    return;
+  }
+
+  results.innerHTML = guests.map(p => {
+
+    const name = p.author || 'Convidado Especial';
+    const initial = name[0].toUpperCase();
+
+    return `
+      <button
+        onclick="selectGuestFromSearch('${p.session_id}')"
+        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-500/10 transition-colors text-left"
+      >
+
+        <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/25 flex items-center justify-center text-sm font-bold text-white">
+
+          ${
+            p.profile_photo
+              ? `<img src="${p.profile_photo}" alt="Foto de ${escapeHtml(name)}" class="w-full h-full object-cover">`
+              : initial
+          }
+
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-slate-100 truncate">
+            ${escapeHtml(name)}
+          </p>
+
+          <p class="text-[11px] text-slate-400">
+            Ver perfil e fotos
+          </p>
+        </div>
+
+      </button>
+    `;
+  }).join('');
+
+  results.classList.remove('hidden');
+}
+
+function selectGuestFromSearch(sessionId) {
+  const input = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (input) input.value = '';
+  if (results) results.classList.add('hidden');
+
+  openPublicProfile(sessionId);
+}
+
+document.addEventListener('click', function(event) {
+  const searchArea = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (!searchArea || !results) return;
+
+  if (
+    event.target !== searchArea &&
+    !results.contains(event.target)
+  ) {
+    results.classList.add('hidden');
+  }
+});
 
     function formatTimeAgo(isoString) {
       if (!isoString) return 'agora';
