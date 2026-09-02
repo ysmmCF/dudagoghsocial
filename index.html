@@ -1238,13 +1238,11 @@ if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
     .getElementById('editCaptionModal')
     .classList.remove('hidden');
 
-  setTimeout(() => {
-    input.focus();
-    input.setSelectionRange(
-      input.value.length,
-      input.value.length
-    );
-  }, 100);
+  input.focus();
+input.setSelectionRange(
+  input.value.length,
+  input.value.length
+);
 }
 
 
@@ -1269,46 +1267,50 @@ async function saveEditedCaption() {
     return;
   }
 
-  // Só o dono da foto pode alterar
+  // Só o dono da foto pode editar
   if (photo.session_id !== currentSessionId) {
     closeEditCaption();
     return;
   }
 
-  const input =
-    document.getElementById('editCaptionInput');
+  const input = document.getElementById('editCaptionInput');
+  const newCaption = input.value.trim();
 
-  const newCaption =
-    input.value.trim();
+  // Guarda a legenda anterior caso seja necessário desfazer
+  const previousCaption = photo.caption || '';
 
-  const previousCaption =
-    photo.caption || '';
-
-  // Atualiza a legenda na tela
+  // Atualiza imediatamente na tela
   photo.caption = newCaption;
 
+  // Fecha o modal IMEDIATAMENTE
+  closeEditCaption();
+
+  // Atualiza o mural imediatamente
   renderFeed();
 
-  // Salva no Supabase
+  // Salva no Supabase em segundo plano
   if (supabaseClient) {
-
-    const { error } =
-      await supabaseClient
+    try {
+      const { error } = await supabaseClient
         .from('photos')
         .update({
           caption: newCaption
         })
-        .eq('id', editingCaptionPhotoId)
+        .eq('id', photo.id)
         .eq('session_id', currentSessionId);
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+    } catch (error) {
 
       console.error(
-        'Erro ao editar legenda:',
+        'Erro ao salvar legenda:',
         error
       );
 
-      // Restaura a legenda anterior se der erro
+      // Se o banco falhar, restaura a legenda anterior
       photo.caption = previousCaption;
 
       renderFeed();
@@ -1316,8 +1318,6 @@ async function saveEditedCaption() {
       alert(
         'Não foi possível salvar a legenda. Tente novamente.'
       );
-
-      return;
     }
 
   } else {
@@ -1325,8 +1325,6 @@ async function saveEditedCaption() {
     saveLocalPhotos();
 
   }
-
-  closeEditCaption();
 }
     function openPublicProfile(sessionId) {
   const userPhotos = photosList.filter(p => p.session_id === sessionId);
