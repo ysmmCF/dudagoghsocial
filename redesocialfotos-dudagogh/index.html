@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta http-equiv="refresh" content="0; url=indexduda.html" />
-  <script>window.location.replace('indexduda.html');</script>
   <title>Eduarda 15 Anos | Mural de fotos</title>
 
   <!-- Google Fonts: Playfair Display & Outfit -->
@@ -57,21 +55,17 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Otimização de Performance GPU Hardware Accelerated */
-    .gpu-accelerated {
-      transform: translateZ(0);
-      will-change: transform;
-    }
-
-    /* Background Oficial Van Gogh com Link Direto de CDN (sem 302 redirects) */
+    /* ==============================================================================
+       IMAGEM DE FUNDO OFICIAL (A NOITE ESTRELADA DE VAN GOGH - WIKIMEDIA)
+       ============================================================================== */
     .van-gogh-bg {
       position: fixed;
       inset: 0;
       pointer-events: none;
       z-index: 0;
       background-image: 
-        linear-gradient(180deg, rgba(4, 7, 20, 0.8) 0%, rgba(4, 7, 20, 0.9) 100%),
-        url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/1280px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg');
+        linear-gradient(180deg, rgba(4, 7, 20, 0.78) 0%, rgba(4, 7, 20, 0.88) 100%),
+        url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -80,25 +74,25 @@
     }
 
     .glass-panel {
-      background: rgba(10, 15, 36, 0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(212, 175, 55, 0.2);
-      box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.45);
+      background: rgba(10, 15, 36, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
     }
 
     .glass-card {
-      background: rgba(12, 18, 42, 0.8);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(212, 175, 55, 0.16);
-      box-shadow: 0 6px 20px 0 rgba(2, 4, 12, 0.5);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+      background: rgba(12, 18, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      box-shadow: 0 6px 24px 0 rgba(2, 4, 12, 0.6);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .glass-card:hover {
       border-color: rgba(212, 175, 55, 0.35);
-      box-shadow: 0 12px 30px -4px rgba(212, 175, 55, 0.15);
+      box-shadow: 0 14px 36px -4px rgba(212, 175, 55, 0.15);
       transform: translateY(-2px);
     }
 
@@ -113,13 +107,9 @@
       color: #040714;
       font-weight: 600;
       letter-spacing: 0.02em;
-      transition: filter 0.2s ease, transform 0.15s ease;
     }
 
-    .gold-button:active {
-      transform: scale(0.97);
-    }
-
+    /* Otimização de botões para telas de celular (Min height 44px) */
     .touch-target {
       min-height: 44px;
       display: inline-flex;
@@ -127,25 +117,26 @@
       justify-content: center;
     }
 
+    /* Keyframes para Animação de Entrada */
     @keyframes fadeInEduarda {
-      0% { opacity: 0; transform: scale(0.92) translateY(12px); }
+      0% { opacity: 0; transform: scale(0.9) translateY(15px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     @keyframes fadeIn15Anos {
-      0% { opacity: 0; transform: scale(0.92) translateY(12px); }
+      0% { opacity: 0; transform: scale(0.9) translateY(15px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
     .animate-eduarda {
-      animation: fadeInEduarda 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.15s;
+      animation: fadeInEduarda 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.2s;
       opacity: 0;
     }
 
     .animate-15anos {
-      animation: fadeIn15Anos 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      animation-delay: 0.7s;
+      animation: fadeIn15Anos 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation-delay: 0.9s; /* Retardado em relação ao nome */
       opacity: 0;
     }
 
@@ -156,41 +147,27 @@
 </head>
 <body class="relative flex flex-col min-h-screen pb-24 sm:pb-0">
 
-  <!-- Layer Van Gogh em Alta Performance -->
-  <div class="van-gogh-bg gpu-accelerated"></div>
+  <!-- Artistic Van Gogh Background Layer -->
+  <div class="van-gogh-bg"></div>
   <canvas id="starryCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
 
-  <!-- Sistema de Popups Toast (Substitui o "página diz" nativo do navegador) -->
-  <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2.5 max-w-sm w-full pointer-events-none px-3 sm:px-0"></div>
-
-  <!-- Modal de Confirmação Customizado (Substitui confirm do navegador) -->
-  <div id="confirmModal" class="hidden fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-    <div class="w-full max-w-sm glass-panel rounded-3xl p-6 border border-amber-500/30 shadow-2xl text-center relative my-auto">
-      <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
-        <svg class="w-6 h-6 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-      </div>
-      <h3 id="confirmTitle" class="font-serif text-lg text-slate-100 font-semibold mb-1">Confirmar Ação</h3>
-      <p id="confirmMessage" class="text-xs text-slate-300 font-light leading-relaxed mb-5"></p>
-      <div class="flex gap-3">
-        <button id="confirmCancelBtn" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors">Cancelar</button>
-        <button id="confirmOkBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-lg transition-colors">Excluir</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Overlay de Abertura Animada -->
-  <div id="entranceOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md transition-opacity duration-700">
+  <!-- ==============================================================================
+       TELA DE ENTRADA ANIMADA (OVERLAY DE BOAS-VINDAS)
+       ============================================================================== -->
+  <div id="entranceOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-950/90 backdrop-blur-2xl transition-opacity duration-1000">
+    <div class="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none" style="background-image: url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');"></div>
+    
     <div class="relative z-10 text-center max-w-md mx-auto">
       <div class="w-36 h-36 mx-auto mb-6 rounded-full shadow-2xl border border-amber-400/40 overflow-hidden">
         <img src="https://ysmmcf.github.io/DudaGogh/R_20260830_164344_0000.png" alt="Logo" class="w-full h-full object-cover" />
       </div>
 
+      <!-- Nome Eduarda (Fade-in primeiro) -->
       <h1 class="animate-eduarda font-serif text-5xl sm:text-7xl font-normal tracking-tight text-slate-100 mb-2">
         Eduarda
       </h1>
 
+      <!-- 15 Anos (Fade-in levemente atrasado) -->
       <div class="animate-15anos">
         <p class="font-serif italic text-3xl sm:text-4xl gold-text font-light mb-6">
           15 Anos
@@ -203,67 +180,33 @@
     </div>
   </div>
 
-  <!-- Modal de Identidade / Conectar Conta -->
-  <div id="identityOverlay" class="hidden fixed inset-0 z-[80] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-    <div class="w-full max-w-sm glass-panel rounded-3xl p-6 sm:p-7 border border-amber-500/25 shadow-2xl text-center relative my-auto">
-      <button onclick="closeIdentityModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-200 p-1 rounded-full text-sm" title="Fechar">✕</button>
-
-      <p class="text-[10px] text-amber-300/80 uppercase tracking-[0.2em] mb-2 font-medium">15 Anos da Eduarda</p>
-      <h2 class="font-serif text-2xl text-slate-100 mb-1">Mural de Memórias</h2>
-      <p id="accountSubtitle" class="text-xs text-slate-300 font-light leading-relaxed mb-4">Escolha como deseja se identificar para interagir na festa.</p>
-
-      <!-- Tabs de Opção -->
-      <div class="flex p-1 rounded-2xl bg-slate-950/80 border border-slate-800 mb-4">
-        <button id="tabAuthGuest" onclick="setAccountTab('guest')" class="flex-1 py-2 text-xs font-semibold rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">Convidado Rápido</button>
-        <button id="tabAuthAccount" onclick="setAccountTab('account')" class="flex-1 py-2 text-xs font-medium rounded-xl text-slate-400 hover:text-slate-200">Conta / Google</button>
-      </div>
-
-      <!-- Formulário Convidado Rápido -->
-      <div id="guestFormSection" class="space-y-3">
-        <p class="text-[11px] text-amber-200/70 text-center font-light leading-relaxed">
-          Como convidado rápido você pode <strong class="text-amber-300 font-medium">curtir e visualizar</strong> todas as fotos! <br/>
-          <span class="text-[10px] text-slate-400">(Para publicar fotos no mural, crie uma conta).</span>
-        </p>
-        <input id="quickGuestName" type="text" maxlength="40" placeholder="Digite seu nome (ex: Yasmim)" class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
-        <button onclick="submitGuestIdentity(document.getElementById('quickGuestName').value)" class="w-full py-3 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">
-          Entrar para Curtir e Visualizar ✨
-        </button>
-      </div>
-
-      <!-- Formulário Conta Completa -->
-      <div id="accountFormSection" class="hidden space-y-3">
-        <p class="text-[11px] text-amber-200/70 text-center font-light leading-relaxed mb-1">
-          Crie ou entre na sua conta para <strong class="text-amber-300 font-medium">publicar fotos</strong> no mural da festa!
-        </p>
-        <form onsubmit="submitAccount(event)" class="space-y-2.5">
-          <input id="welcomeNameInput" type="text" maxlength="40" autocomplete="name" placeholder="Seu nome completo" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-slate-100 text-xs text-center focus:border-amber-400 outline-none" />
-          <input id="accountEmail" type="email" required autocomplete="email" placeholder="Seu e-mail" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-slate-100 text-xs text-center focus:border-amber-400 outline-none" />
-          <input id="accountPassword" type="password" required minlength="6" autocomplete="new-password" placeholder="Senha (mín. 6 caracteres)" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/80 border border-slate-700 text-slate-100 text-xs text-center focus:border-amber-400 outline-none" />
-          <p id="accountMessage" class="hidden text-xs leading-relaxed"></p>
-          <button id="accountSubmit" type="submit" class="w-full py-3 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">Criar meu perfil</button>
-        </form>
-
-        <div class="flex items-center gap-3 my-2"><span class="h-px flex-1 bg-slate-800"></span><span class="text-[10px] uppercase tracking-widest text-slate-500">ou</span><span class="h-px flex-1 bg-slate-800"></span></div>
-
-        <button onclick="signInWithGoogle()" class="w-full py-2.5 rounded-xl bg-white text-slate-800 text-xs font-semibold shadow-lg touch-target flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.39-.18-2.05H12v3.87h5.24a4.48 4.48 0 01-1.94 2.94v2.51h3.14c1.84-1.69 2.91-4.19 2.91-7.27z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.35l-3.14-2.51c-.87.58-1.99.92-3.31.92-2.54 0-4.7-1.72-5.47-4.02H3.3v2.59A9.75 9.75 0 0012 21.75z"/><path fill="#FBBC05" d="M6.53 13.79A5.87 5.87 0 016.23 12c0-.62.11-1.22.3-1.79V7.62H3.3A9.75 9.75 0 002.25 12c0 1.57.38 3.05 1.05 4.38l3.23-2.59z"/><path fill="#EA4335" d="M12 6.19c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.28 14.63 2.25 12 2.25A9.75 9.75 0 003.3 7.62l3.23 2.59C7.3 7.91 9.46 6.19 12 6.19z"/></svg>
-          Entrar com Google
-        </button>
-        <button id="accountModeButton" onclick="toggleAccountMode()" class="mt-2 text-[11px] text-amber-200/75 hover:text-amber-100 underline underline-offset-4">Já tenho uma conta</button>
-      </div>
-
-      <div class="mt-4 pt-3 border-t border-slate-800/60">
-        <button onclick="closeIdentityModal()" class="text-xs text-slate-400 hover:text-slate-200 transition-colors">
-          Continuar navegando como visitante
-        </button>
-      </div>
-    </div>
+  <!-- Conta persistente do convidado, exibida depois da abertura quando necessário. -->
+  <div id="identityOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/85 backdrop-blur-xl">
+    <section class="w-full max-w-sm glass-panel rounded-3xl p-7 sm:p-8 border border-amber-500/25 shadow-2xl text-center">
+      <p class="text-[10px] text-amber-300/70 uppercase tracking-[0.22em] mb-3">Uma noite para guardar</p>
+      <h2 class="font-serif text-2xl text-slate-100 mb-2">Bem-vindo à noite da Eduarda</h2>
+      <p id="accountSubtitle" class="text-xs text-slate-300 font-light leading-relaxed mb-6">Crie seu perfil para guardar memórias desta noite tão incrível.</p>
+      <form onsubmit="submitAccount(event)" class="space-y-3">
+        <input id="welcomeNameInput" type="text" required maxlength="40" autocomplete="name" placeholder="Seu nome" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <input id="accountEmail" type="email" required autocomplete="email" placeholder="Seu e-mail" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <input id="accountPassword" type="password" required minlength="6" autocomplete="new-password" placeholder="Crie uma senha (mínimo 6 caracteres)" class="w-full px-4 py-3.5 rounded-xl bg-slate-950/70 border border-slate-700 text-slate-100 text-sm text-center focus:border-amber-400 outline-none" />
+        <p id="accountMessage" class="hidden text-xs leading-relaxed"></p>
+        <button id="accountSubmit" type="submit" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">Criar meu perfil</button>
+      </form>
+      <button type="button" onclick="continueAsGuest()" class="w-full mt-3 py-3 rounded-xl border border-amber-500/30 text-amber-200 text-xs font-semibold hover:bg-amber-500/10 transition-colors touch-target">Continuar como convidado</button>
+      <div class="flex items-center gap-3 my-5"><span class="h-px flex-1 bg-slate-700/70"></span><span class="text-[10px] uppercase tracking-widest text-slate-500">ou</span><span class="h-px flex-1 bg-slate-700/70"></span></div>
+      <button onclick="signInWithGoogle()" class="w-full py-3 rounded-xl bg-white text-slate-800 text-xs font-semibold shadow-lg touch-target flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.39-.18-2.05H12v3.87h5.24a4.48 4.48 0 01-1.94 2.94v2.51h3.14c1.84-1.69 2.91-4.19 2.91-7.27z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.35l-3.14-2.51c-.87.58-1.99.92-3.31.92-2.54 0-4.7-1.72-5.47-4.02H3.3v2.59A9.75 9.75 0 0012 21.75z"/><path fill="#FBBC05" d="M6.53 13.79A5.87 5.87 0 016.23 12c0-.62.11-1.22.3-1.79V7.62H3.3A9.75 9.75 0 002.25 12c0 1.57.38 3.05 1.05 4.38l3.23-2.59z"/><path fill="#EA4335" d="M12 6.19c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.28 14.63 2.25 12 2.25A9.75 9.75 0 003.3 7.62l3.23 2.59C7.3 7.91 9.46 6.19 12 6.19z"/></svg>
+        Continuar com Google
+      </button>
+      <button id="accountModeButton" onclick="toggleAccountMode()" class="mt-5 text-xs text-amber-200/75 hover:text-amber-100 underline underline-offset-4">Já tenho um perfil</button>
+    </section>
   </div>
 
   <!-- Header Navigation -->
   <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/15 px-3.5 py-3 sm:px-8">
-    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
-      <a href="index.html" class="flex items-center gap-2.5 shrink-0">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="indexduda.html" class="flex items-center gap-2.5">
         <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-full shadow-lg border border-amber-400/30 shrink-0 overflow-hidden">
           <img src="https://ysmmcf.github.io/DudaGogh/R_20260830_164344_0000.png" alt="Logo" class="w-full h-full object-cover" />
         </div>
@@ -277,31 +220,7 @@
         </div>
       </a>
 
-      <!-- Busca de convidados -->
-      <div class="relative flex-1 max-w-xs mx-2">
-        <div class="relative">
-          <input
-            id="guestSearchInput"
-            type="text"
-            oninput="searchGuests()"
-            placeholder="Buscar convidado..."
-            class="w-full pl-8 pr-3 py-1.5 rounded-full bg-slate-950/60 border border-amber-500/20 text-slate-100 text-xs focus:border-amber-400 outline-none transition-colors"
-          />
-          <svg class="w-3.5 h-3.5 absolute left-2.5 top-2 text-amber-300/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        <div id="guestSearchResults" class="hidden absolute top-full left-0 right-0 mt-1 rounded-2xl glass-panel border border-amber-500/25 shadow-2xl overflow-hidden z-50 max-h-60 overflow-y-auto"></div>
-      </div>
-
-      <div class="flex items-center gap-2 shrink-0">
-        <!-- Botão de Notificações -->
-        <button onclick="openNotificationsModal()" class="relative p-2 text-slate-300 hover:text-amber-300 rounded-full bg-slate-950/60 border border-amber-500/20 transition-colors touch-target">
-          <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0018 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 00-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
-          </svg>
-          <span id="notifBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border border-slate-950">0</span>
-        </button>
+      <div class="flex items-center gap-2">
 
         <button onclick="openUploadModal()" class="flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm rounded-full gold-button shadow-md touch-target font-medium">
           <svg class="w-4 h-4 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -317,10 +236,10 @@
   <!-- Main Section -->
   <main class="flex-1 max-w-3xl w-full mx-auto px-3 sm:px-6 pt-4 pb-12 z-10 relative">
 
-    <!-- Barra estilo rede social -->
-    <div class="flex items-center justify-between mb-4 px-1">
+    <!-- Contador discreto: os filtros ficam na barra inferior, como em um app mobile. -->
+    <div class="flex items-center mb-4 px-1">
       <div class="flex items-center gap-2">
-        <span class="text-amber-400/80 text-sm flex items-center">
+        <span class="text-amber-400/80 text-sm">
           <svg class="w-4 h-4 inline-block mr-1 fill-amber-400/20 stroke-amber-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
@@ -329,19 +248,114 @@
         </span>
       </div>
 
-      <!-- Filtros -->
-      <div class="flex items-center gap-1 p-0.5 rounded-full bg-slate-950/80 border border-amber-500/15">
-        <button id="tabRecent" onclick="setSortMode('recent')" class="px-3 py-1 rounded-full text-xs font-medium gold-button transition-all">Recentes</button>
-        <button id="tabHighlights" onclick="setSortMode('highlights')" class="px-3 py-1 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">Destaques</button>
-        <button id="tabMyPhotos" onclick="setSortMode('my-photos')" class="px-3 py-1 rounded-full text-xs font-medium text-slate-400 hover:text-slate-200 transition-all">Minhas</button>
-      </div>
     </div>
 
-    <!-- Painel de Perfil do Convidado (na aba Minhas Fotos) -->
-    <div id="myProfile" class="hidden mb-6 p-4 sm:p-6 rounded-2xl glass-panel border border-amber-500/25 shadow-xl"></div>
+    <!-- Perfil: aparece somente em Minhas, antes da grade de fotos. -->
+    <section id="myProfile" class="hidden mb-5 rounded-2xl glass-card p-4">
+      <div class="flex items-center gap-4">
+        <label class="relative block w-16 h-16 shrink-0 cursor-pointer">
+          <div id="profileAvatar" class="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/35 flex items-center justify-center font-serif text-xl text-white"></div>
+          <span class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-amber-400 text-slate-950 border-2 border-slate-950 flex items-center justify-center">+</span>
+          <input id="profilePhotoInput" type="file" accept="image/*" class="hidden" onchange="handleProfilePhoto(event)" />
+        </label>
+        <div class="min-w-0 flex-1">
+          <p class="text-[10px] uppercase tracking-widest text-amber-200/55 mb-1">Meu perfil</p>
+          <div class="flex gap-2">
+            <input id="profileNameInput" type="text" maxlength="40" class="min-w-0 flex-1 bg-slate-950/65 border border-slate-700 rounded-lg px-2.5 py-2 text-sm text-slate-100 outline-none focus:border-amber-400" />
+            <button onclick="saveProfile()" class="px-3 rounded-lg gold-button text-xs font-semibold">Salvar</button>
+          </div>
+          <p id="profilePhotoCount" class="mt-2 text-[11px] text-slate-400"></p>
+        </div>
+      </div>
+    </section>
 
     <!-- Feed -->
-    <div id="photoFeed" class="flex flex-col gap-5"></div>
+    <!-- PESQUISA DE CONVIDADOS -->
+<div class="mb-4 relative">
+
+  <div class="relative">
+
+    <svg
+      class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.8"
+        d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"
+      />
+    </svg>
+
+    <input
+      id="guestSearchInput"
+      type="text"
+      placeholder="Pesquisar convidado..."
+      autocomplete="off"
+      oninput="searchGuests()"
+      class="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-950/65 border border-slate-800 text-slate-100 text-sm outline-none focus:border-amber-400 transition-colors"
+    >
+
+  </div>
+
+  <div
+    id="guestSearchResults"
+    class="hidden absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl glass-panel border border-amber-500/20 shadow-2xl overflow-hidden"
+  ></div>
+
+</div>
+
+<!-- Feed -->
+<div id="photoFeed" class="flex flex-col gap-5"></div>
+    <!-- PERFIL PÚBLICO DO CONVIDADO -->
+<div id="publicProfileModal" class="hidden fixed inset-0 z-[80] bg-slate-950/90 backdrop-blur-sm p-4 overflow-y-auto">
+  <div class="min-h-full flex items-center justify-center">
+    <div class="w-full max-w-lg rounded-3xl glass-panel border border-amber-500/20 shadow-2xl overflow-hidden">
+
+      <div class="flex items-center justify-between px-5 py-4 border-b border-amber-500/10">
+        <h2 class="font-serif text-lg text-slate-100">Perfil do convidado</h2>
+
+        <button
+          onclick="closePublicProfile()"
+          class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center"
+          aria-label="Fechar perfil"
+        >
+          ✕
+        </button>
+      </div>
+
+      <div class="p-5">
+
+        <div class="flex items-center gap-4 mb-6">
+          <div
+            id="publicProfileAvatar"
+            class="w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/30 flex items-center justify-center text-white text-2xl font-bold shrink-0"
+          ></div>
+
+          <div class="min-w-0">
+            <h3
+              id="publicProfileName"
+              class="text-lg font-semibold text-slate-100 truncate"
+            ></h3>
+
+            <p
+              id="publicProfileCount"
+              class="text-xs text-slate-400 mt-1"
+            ></p>
+          </div>
+        </div>
+
+        <div
+          id="publicProfilePhotos"
+          class="grid grid-cols-3 gap-1.5"
+        ></div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- Empty State -->
     <div id="emptyState" class="hidden max-w-md mx-auto my-8 p-6 sm:p-8 rounded-3xl glass-panel text-center border border-amber-500/20 shadow-2xl">
@@ -358,22 +372,27 @@
     </div>
   </main>
 
-  <!-- Navegação Inferior Mobile -->
-  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 sm:hidden glass-panel border-t border-amber-500/20 px-2 py-1.5 flex items-center justify-around shadow-2xl">
-    <button id="navMural" onclick="setSortMode('recent')" class="flex flex-col items-center justify-center p-1.5 text-amber-300 transition-colors">
+  <!-- ==============================================================================
+       BARRA DE NAVEGAÇÃO INFERIOR PARA CELULARES (MOBILE BOTTOM NAVIGATION BAR)
+       ============================================================================== -->
+  <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 z-40 sm:hidden glass-panel border-t border-amber-500/20 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] grid grid-cols-4 items-end shadow-2xl">
+    <!-- Tab 1: Recentes -->
+    <button id="navMural" onclick="setSortMode('recent')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m4-2a8 8 0 11-16 0 8 8 0 0116 0z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Mural</span>
+      <span class="text-[10px] font-medium">Recentes</span>
     </button>
 
-    <button id="navDestaques" onclick="setSortMode('highlights')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+    <!-- Tab 2: Destaques -->
+    <button id="navDestaques" onclick="setSortMode('highlights')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Destaques</span>
+      <span class="text-[10px] font-medium">Destaques</span>
     </button>
 
+    <!-- Tab 3: Publicar Foto (Central Highlight Button) -->
     <button onclick="openUploadModal()" class="flex flex-col items-center justify-center -mt-5">
       <div class="w-12 h-12 rounded-full gold-button flex items-center justify-center shadow-xl border border-amber-300/40">
         <svg class="w-6 h-6 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -383,37 +402,20 @@
       <span class="text-[10px] font-medium text-amber-300 mt-1">Publicar</span>
     </button>
 
-    <button id="navMinhas" onclick="setSortMode('my-photos')" class="flex flex-col items-center justify-center p-1.5 text-slate-400 transition-colors">
+    <!-- Tab 4: Minhas Fotos -->
+    <button id="navMinhas" onclick="setSortMode('my-photos')" class="flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors">
       <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
       </svg>
-      <span class="text-[10px] font-medium mt-0.5">Minhas Fotos</span>
+      <span class="text-[10px] font-medium">Minhas</span>
     </button>
+
   </nav>
 
-  <!-- Modal de Notificações -->
-  <div id="notificationsModal" class="hidden fixed inset-0 z-[85] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-    <div class="w-full max-w-md glass-panel rounded-3xl p-5 border border-amber-500/25 shadow-2xl relative my-auto max-h-[85vh] flex flex-col">
-      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-        <h3 class="font-serif text-lg text-slate-100 flex items-center gap-2">
-          <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-          Notificações
-        </h3>
-        <div class="flex items-center gap-2">
-          <button onclick="clearNotifications()" class="text-xs text-amber-300/80 hover:text-amber-200">Limpar</button>
-          <button onclick="closeNotificationsModal()" class="w-8 h-8 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center hover:text-white transition-colors">✕</button>
-        </div>
-      </div>
-
-      <div id="notificationsListContainer" class="flex-1 overflow-y-auto space-y-2.5 pr-1"></div>
-    </div>
-  </div>
-
   <!-- Upload Modal -->
-  <div id="uploadModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-slate-950/85 backdrop-blur-md">
-    <div class="relative w-full max-w-lg glass-panel rounded-3xl p-5 sm:p-8 border border-amber-500/25 shadow-2xl my-auto max-h-[92vh] overflow-y-auto">
+  <div id="uploadModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div onclick="closeUploadModal()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md"></div>
+    <div class="relative w-full max-w-lg glass-panel rounded-3xl p-5 sm:p-8 border border-amber-500/25 shadow-2xl z-10 my-auto max-h-[92vh] overflow-y-auto">
       <button onclick="closeUploadModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-100 rounded-full bg-slate-900/60 border border-slate-700/40 touch-target">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
@@ -469,8 +471,63 @@
   </div>
 
   <!-- Lightbox Modal -->
-  <div id="lightboxModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/90 backdrop-blur-md">
-    <div onclick="closeLightbox()" class="fixed inset-0"></div>
+  <div id="lightboxModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+    <!-- Modal para editar legenda -->
+<div
+  id="editCaptionModal"
+  class="hidden fixed inset-0 z-[90] bg-slate-950/90 backdrop-blur-sm p-4"
+>
+  <div class="min-h-full flex items-center justify-center">
+
+    <div class="w-full max-w-md rounded-3xl glass-panel border border-amber-500/20 shadow-2xl p-5">
+
+      <div class="flex items-center justify-between mb-5">
+
+        <h2 class="font-serif text-lg text-slate-100">
+          Editar legenda
+        </h2>
+
+        <button
+          onclick="closeEditCaption()"
+          class="w-9 h-9 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center hover:text-white transition-colors"
+          aria-label="Fechar"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <textarea
+        id="editCaptionInput"
+        maxlength="300"
+        rows="4"
+        placeholder="Escreva uma legenda..."
+        class="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 text-slate-100 text-sm outline-none resize-none focus:border-amber-400"
+      ></textarea>
+
+      <div class="flex gap-2 mt-4">
+
+        <button
+          onclick="closeEditCaption()"
+          class="flex-1 py-3 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold"
+        >
+          Cancelar
+        </button>
+
+        <button
+          onclick="saveEditedCaption()"
+          class="flex-1 py-3 rounded-xl gold-button text-xs font-semibold"
+        >
+          Salvar legenda
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+    <div onclick="closeLightbox()" class="fixed inset-0 bg-slate-950/90 backdrop-blur-xl"></div>
     <div class="relative max-w-4xl w-full glass-panel rounded-3xl overflow-hidden border border-amber-500/30 shadow-2xl z-10 flex flex-col md:flex-row my-auto max-h-[92vh]">
       <button onclick="closeLightbox()" class="absolute top-3 right-3 z-20 p-2 rounded-full bg-slate-950/80 border border-slate-700 text-slate-300 hover:text-white touch-target">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -488,60 +545,1012 @@
     </div>
   </div>
 
-  <!-- Modal para Editar Legenda (Sem delay, abertura instantânea) -->
-  <div id="editCaptionModal" class="hidden fixed inset-0 z-[90] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-    <div class="w-full max-w-md glass-panel rounded-3xl p-5 border border-amber-500/20 shadow-2xl relative my-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-serif text-lg text-slate-100 flex items-center gap-2">
-          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"/>
-          </svg>
-          Editar legenda
-        </h3>
-        <button onclick="closeEditCaption()" class="w-8 h-8 rounded-full bg-slate-900/80 border border-slate-700 text-slate-300 flex items-center justify-center hover:text-white transition-colors" aria-label="Fechar">
-          ✕
-        </button>
-      </div>
-
-      <textarea id="editCaptionInput" maxlength="300" rows="3" placeholder="Escreva uma legenda..." class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-slate-800 text-slate-100 text-sm outline-none resize-none focus:border-amber-400 transition-colors"></textarea>
-
-      <div class="flex gap-2.5 mt-4">
-        <button onclick="closeEditCaption()" class="flex-1 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 text-xs font-semibold hover:bg-slate-800 transition-colors">
-          Cancelar
-        </button>
-        <button onclick="saveEditedCaption()" class="flex-1 py-2.5 rounded-xl gold-button text-xs font-semibold shadow-lg">
-          Salvar legenda
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Perfil Público -->
-  <div id="publicProfileModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-    <div class="w-full max-w-lg glass-panel rounded-3xl p-6 border border-amber-500/25 shadow-2xl relative my-auto max-h-[90vh] flex flex-col">
-      <button onclick="closePublicProfile()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-100 rounded-full bg-slate-900/60 border border-slate-700/40">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-      </button>
-      <div class="flex items-center gap-4 mb-5 shrink-0">
-        <div id="publicProfileAvatar" class="w-14 h-14 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border-2 border-amber-400/40 flex items-center justify-center text-slate-100 text-xl font-bold overflow-hidden shrink-0"></div>
-        <div>
-          <h3 id="publicProfileName" class="font-serif text-xl text-slate-100 font-semibold"></h3>
-          <p id="publicProfileCount" class="text-xs text-amber-200/60 mt-0.5"></p>
-        </div>
-      </div>
-      <div id="publicProfilePhotos" class="grid grid-cols-3 gap-2 overflow-y-auto pr-1"></div>
-    </div>
-  </div>
-
   <!-- Footer -->
   <footer class="z-10 py-6 border-t border-amber-500/10 text-center text-xs text-amber-200/40 font-light glass-panel">
     15 Anos da Eduarda • Noite Estrelada
   </footer>
 
-  <!-- Módulos JavaScript da Aplicação -->
-  <script src="js/ui.js"></script>
-  <script src="js/notifications.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/feed.js"></script>
+  <script>
+    let photosList = [];
+let sortMode = 'recent';
+let editingCaptionPhotoId = null;
+let currentSessionId = localStorage.getItem('duda15_session') || null;
+    // Persistência leve do convidado: só nome e identificador; fotos ficam no Storage.
+    let rememberedAuthor = localStorage.getItem('duda15_author') || '';
+    let profilePhoto = localStorage.getItem('duda15_profile_photo') || '';
+    let accountMode = 'signup';
+    let accountReady = false;
+
+    // ==========================================================
+    // CONFIGURAÇÃO DO SUPABASE
+    // ==========================================================
+    let supabaseUrl = 'https://fmvucmpomfogfzfdpfln.supabase.co';
+    let supabaseAnonKey = 'sb_publishable_hJJu5Ytx26zgGbHhCLmh5A_aVIHoK6d';
+    // ==========================================================
+
+    let supabaseClient = null;
+
+if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+  try {
+    supabaseClient = supabase.createClient(
+      supabaseUrl,
+      supabaseAnonKey,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+  } catch (e) {
+    console.error('Erro ao iniciar o Supabase:', e);
+  }
+}
+
+    
+    function dismissEntrance() {
+      const overlay = document.getElementById('entranceOverlay');
+      if (overlay) {
+        overlay.remove();
+      }
+      initializeAccount();
+    }
+
+    // Mostra as fotos após 2 segundos.
+    setTimeout(dismissEntrance, 2000);
+
+    function showIdentityIfNeeded() {
+      if (accountReady) return;
+      const identityOverlay = document.getElementById('identityOverlay');
+      identityOverlay.classList.remove('hidden');
+      setTimeout(() => document.getElementById('welcomeNameInput').focus(), 80);
+    }
+
+    async function initializeAccount() {
+  if (currentSessionId && currentSessionId.startsWith('guest_') && rememberedAuthor) {
+    accountReady = true;
+    document.getElementById('identityOverlay').classList.add('hidden');
+  }
+
+  if (!supabaseClient) {
+    loadPhotos();
+    return;
+  }
+
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error) {
+    console.error('Erro ao recuperar sessão:', error);
+    loadPhotos();
+    return;
+  }
+
+  if (data.session) {
+    setAccountSession(data.session.user);
+  } else {
+    document.getElementById('identityOverlay').classList.add('hidden');
+    loadPhotos();
+  }
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      setAccountSession(session.user);
+    } else {
+      accountReady = false;
+      currentSessionId = null;
+      document.getElementById('identityOverlay').classList.add('hidden');
+      loadPhotos();
+    }
+  });
+}
+
+    function continueAsGuest() {
+      const nameInput = document.getElementById('welcomeNameInput');
+      const name = nameInput.value.trim();
+      if (!name) {
+        nameInput.focus();
+        nameInput.reportValidity();
+        return;
+      }
+
+      rememberedAuthor = name;
+      localStorage.setItem('duda15_author', name);
+      if (!currentSessionId || !currentSessionId.startsWith('guest_')) {
+        currentSessionId = 'guest_' + Math.random().toString(36).slice(2, 11);
+      }
+      localStorage.setItem('duda15_session', currentSessionId);
+      accountReady = true;
+      document.getElementById('identityOverlay').classList.add('hidden');
+      openUploadModal();
+    }
+
+    function setAccountSession(user) {
+      accountReady = true;
+      currentSessionId = user.id;
+      localStorage.setItem('duda15_session', currentSessionId);
+      const metadata = user.user_metadata || {};
+      const savedName = metadata.display_name || metadata.full_name || metadata.name || (user.email || '').split('@')[0];
+      if (savedName) { rememberedAuthor = savedName; localStorage.setItem('duda15_author', savedName); }
+      document.getElementById('identityOverlay').classList.add('hidden');
+      loadPhotos();
+    }
+
+    function toggleAccountMode() {
+      accountMode = accountMode === 'signup' ? 'signin' : 'signup';
+      const signup = accountMode === 'signup';
+      const name = document.getElementById('welcomeNameInput');
+      const password = document.getElementById('accountPassword');
+      name.classList.toggle('hidden', !signup);
+      name.required = signup;
+      password.autocomplete = signup ? 'new-password' : 'current-password';
+      password.placeholder = signup ? 'Crie uma senha (mínimo 6 caracteres)' : 'Sua senha';
+      document.getElementById('accountSubtitle').textContent = signup ? 'Crie seu perfil para guardar suas memórias.' : 'Entre para acessar o perfil que você já criou.';
+      document.getElementById('accountSubmit').textContent = signup ? 'Criar meu perfil' : 'Entrar no meu perfil';
+      document.getElementById('accountModeButton').textContent = signup ? 'Já tenho um perfil' : 'Ainda não tenho perfil';
+      document.getElementById('accountMessage').classList.add('hidden');
+    }
+
+    async function submitAccount(event) {
+      event.preventDefault();
+      if (!supabaseClient) { alert('O serviço de contas não está disponível.'); return; }
+      const email = document.getElementById('accountEmail').value.trim();
+      const password = document.getElementById('accountPassword').value;
+      const name = document.getElementById('welcomeNameInput').value.trim();
+      const button = document.getElementById('accountSubmit');
+      const message = document.getElementById('accountMessage');
+      button.disabled = true; button.textContent = 'Aguarde...';
+      let result;
+      if (accountMode === 'signup') {
+        result = await supabaseClient.auth.signUp({ email, password, options: { data: { display_name: name } } });
+      } else {
+        result = await supabaseClient.auth.signInWithPassword({ email, password });
+      }
+      button.disabled = false; button.textContent = accountMode === 'signup' ? 'Criar meu perfil' : 'Entrar no meu perfil';
+      if (result.error) { message.textContent = result.error.message; message.className = 'text-xs leading-relaxed text-rose-300'; return; }
+      if (result.data.session) { setAccountSession(result.data.session.user); return; }
+      message.textContent = 'Perfil criado. Confirme o e-mail recebido e depois entre com sua conta.';
+      message.className = 'text-xs leading-relaxed text-amber-200';
+      message.textContent = '';
+    }
+
+    async function signInWithGoogle() {
+  if (!supabaseClient) {
+    alert('O serviço de contas não está disponível.');
+    return;
+  }
+
+  const message = document.getElementById('accountMessage');
+
+  // Return to this exact GitHub Pages path after Supabase finishes OAuth.
+  // This project is deployed below /dudagoghsocial/redesocialfotos-dudagogh/.
+  const redirectTo = `${window.location.origin}${window.location.pathname}`;
+
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: redirectTo
+    }
+  });
+
+  if (error) {
+    console.error('Erro no login com Google:', error);
+    message.textContent = error.message;
+    message.className = 'text-xs leading-relaxed text-rose-300';
+  }
+}
+
+    function initStarryCanvas() {
+      const canvas = document.getElementById('starryCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = canvas.width = window.innerWidth;
+      let h = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const colors = ['#d4af37', '#f3e5ab', '#ffffff', '#60a5fa'];
+      const stars = Array.from({ length: 70 }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.3,
+        c: colors[Math.floor(Math.random() * colors.length)],
+        a: Math.random() * 0.6 + 0.2,
+        s: Math.random() * 0.015 + 0.005
+      }));
+
+      let frame = 0;
+      function animate() {
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+        stars.forEach(st => {
+          st.a += Math.sin(frame * st.s) * 0.01;
+          if (st.a > 0.8) st.a = 0.8;
+          if (st.a < 0.1) st.a = 0.1;
+          ctx.save();
+          ctx.globalAlpha = st.a;
+          ctx.fillStyle = st.c;
+          ctx.beginPath();
+          ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    async function loadPhotos() {
+      if (supabaseClient) {
+        const { data, error } = await supabaseClient.from('photos').select('*').order('created_at', { ascending: false });
+        if (!error && data) {
+          photosList = data;
+          renderFeed();
+          return;
+        }
+      }
+      const localData = localStorage.getItem('duda15_photos');
+      photosList = localData ? JSON.parse(localData) : [];
+      renderFeed();
+    }
+
+    function saveLocalPhotos() {
+      localStorage.setItem('duda15_photos', JSON.stringify(photosList));
+    }
+
+    function renderProfile() {
+      const panel = document.getElementById('myProfile');
+      const mine = photosList.filter(p => p.session_id === currentSessionId);
+      panel.classList.toggle('hidden', sortMode !== 'my-photos');
+      if (sortMode !== 'my-photos') return;
+      document.getElementById('profileNameInput').value = rememberedAuthor;
+      document.getElementById('profilePhotoCount').textContent = `${mine.length} ${mine.length === 1 ? 'foto compartilhada' : 'fotos compartilhadas'}`;
+      const avatar = document.getElementById('profileAvatar');
+      avatar.innerHTML = profilePhoto
+        ? `<img src="${profilePhoto}" alt="Foto de perfil" class="w-full h-full object-cover">`
+        : escapeHtml((rememberedAuthor || 'E')[0].toUpperCase());
+    }
+
+    function handleProfilePhoto(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        profilePhoto = reader.result;
+        localStorage.setItem('duda15_profile_photo', profilePhoto);
+        renderProfile();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function saveProfile() {
+      const nextName = document.getElementById('profileNameInput').value.trim();
+      if (!nextName) { alert('Informe seu nome.'); return; }
+      const previousName = rememberedAuthor;
+      rememberedAuthor = nextName;
+      localStorage.setItem('duda15_author', nextName);
+      photosList.forEach(p => { if (p.session_id === currentSessionId) p.author = nextName; });
+      renderProfile();
+      renderFeed();
+      if (supabaseClient) {
+        await supabaseClient.auth.updateUser({ data: { display_name: nextName } });
+        const { error } = await supabaseClient.from('photos').update({
+  author: nextName,
+  profile_photo: profilePhoto || ''
+}).eq('session_id', currentSessionId);
+        if (error) {
+          rememberedAuthor = previousName;
+          localStorage.setItem('duda15_author', previousName);
+          await loadPhotos();
+          alert('O nome foi salvo apenas neste aparelho. Não foi possível atualizar as fotos já publicadas.');
+        }
+      } else {
+        saveLocalPhotos();
+      }
+    }
+
+    function renderFeed() {
+      const feedEl = document.getElementById('photoFeed');
+      const emptyEl = document.getElementById('emptyState');
+      const counterEl = document.getElementById('memoryCounter');
+      const feedTitleEl = document.getElementById('feedTitle');
+
+      counterEl.textContent = photosList.length;
+      feedEl.className = sortMode === 'my-photos' ? 'grid grid-cols-3 gap-1.5' : 'flex flex-col gap-5';
+      renderProfile();
+
+      let displayed = [...photosList];
+
+      if (sortMode === 'highlights') {
+        if (feedTitleEl) feedTitleEl.textContent = "Momentos em Destaque";
+        displayed.sort((a, b) => {
+          if ((b.likes_count || 0) !== (a.likes_count || 0)) {
+            return (b.likes_count || 0) - (a.likes_count || 0);
+          }
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+      } else if (sortMode === 'my-photos') {
+        if (feedTitleEl) feedTitleEl.textContent = "Minhas Fotos Compartilhadas";
+        displayed = displayed.filter(p => p.session_id === currentSessionId);
+      } else {
+        if (feedTitleEl) feedTitleEl.textContent = "Mural de Fotos";
+        displayed.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      }
+
+      if (displayed.length === 0) {
+        feedEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        
+        if (sortMode === 'my-photos') {
+          document.getElementById('emptyStateTitle').textContent = 'Você ainda não compartilhou fotos';
+          document.getElementById('emptyStateDesc').textContent = 'Envie sua primeira foto da festa e ela aparecerá nesta aba!';
+        } else {
+          document.getElementById('emptyStateTitle').textContent = 'À espera das primeiras memórias';
+          document.getElementById('emptyStateDesc').textContent = 'Compartilhe uma foto e faça parte da história desta noite especial.';
+        }
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+
+      feedEl.innerHTML = displayed.map(p => {
+        const likedBy = Array.isArray(p.liked_by) ? p.liked_by : [];
+        const isLiked = likedBy.includes(currentSessionId);
+        const isMyPhoto = p.session_id === currentSessionId;
+        const timeStr = formatTimeAgo(p.created_at);
+        const initial = (p.author || 'C')[0].toUpperCase();
+
+        if (sortMode === 'my-photos') {
+          return `
+            <article class="relative aspect-square overflow-hidden rounded-lg bg-black group">
+              <img onclick="openLightbox('${p.id}')" src="${p.image_url}" alt="Minha foto" loading="lazy" class="w-full h-full object-cover cursor-pointer transition-transform duration-300 group-hover:scale-105" />
+              <button onclick="deletePhoto('${p.id}')" class="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-slate-950/80 text-rose-200 border border-rose-300/25 flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity" aria-label="Excluir minha foto">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 7h12m-8 4v6m4-6v6M9 7l1-2h4l1 2m-7 0 .5 13h7L16 7" /></svg>
+              </button>
+            </article>`;
+        }
+
+        return `
+          <article class="glass-card rounded-2xl overflow-hidden group">
+            <!-- Cabeçalho do post (estilo rede social) -->
+            <div class="flex items-center gap-3 px-4 py-3">
+
+  <button
+    onclick="openPublicProfile('${p.session_id}')"
+    class="w-9 h-9 rounded-full bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-500/30 flex items-center justify-center text-slate-100 text-sm font-bold shrink-0 overflow-hidden cursor-pointer hover:scale-105 transition-transform"
+    aria-label="Abrir perfil de ${escapeHtml(p.author || 'Convidado Especial')}"
+  >
+    ${
+      p.profile_photo
+        ? `<img src="${p.profile_photo}" alt="Foto de perfil" class="w-full h-full object-cover" />`
+        : initial
+    }
+  </button>
+
+  <div class="flex-1 min-w-0">
+
+    <div class="flex items-center gap-2 flex-wrap">
+
+      <button
+        onclick="openPublicProfile('${p.session_id}')"
+        class="text-sm font-semibold text-slate-100 truncate hover:text-amber-300 transition-colors"
+      >
+        ${escapeHtml(p.author || 'Convidado Especial')}
+      </button>
+
+      ${isMyPhoto ? '<span class="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 font-medium">você</span>' : ''}
+
+    </div>
+
+    <p class="text-[11px] text-amber-200/50">${timeStr}</p>
+
+  </div>
+
+</div>
+
+            <!-- Foto (clicável para lightbox) -->
+            <div onclick="openLightbox('${p.id}')" class="relative w-full aspect-square bg-black overflow-hidden cursor-pointer">
+              <img src="${p.image_url}" alt="Foto" loading="lazy" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" />
+            </div>
+
+            <!-- Ações e legenda -->
+            <div class="px-4 py-3 space-y-2">
+              <!-- Botão curtir -->
+              <div class="flex items-center gap-3">
+                <button onclick="toggleLike('${p.id}')" class="flex items-center gap-1.5 touch-target transition-all ${isLiked ? 'text-rose-400' : 'text-slate-400 hover:text-rose-300'}">
+                  <svg class="w-5 h-5 transition-all ${isLiked ? 'fill-rose-400 stroke-rose-400 scale-110' : 'stroke-current'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+               ${isMyPhoto ? `
+  <div class="ml-auto flex items-center gap-1">
+
+    <!-- Editar legenda -->
+    <button
+      onclick="openEditCaption('${p.id}')"
+      class="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-amber-300 transition-colors"
+      aria-label="Editar legenda"
+    >
+
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"
+        />
+      </svg>
+
+      Editar
+
+    </button>
+
+    <!-- Excluir foto -->
+    <button
+      onclick="deletePhoto('${p.id}')"
+      class="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-400 hover:text-rose-300 transition-colors"
+      aria-label="Excluir minha foto"
+    >
+
+      <svg
+        class="w-4 h-4"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="1.8"
+          d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166M4.772 5.79a48.108 48.108 0 0 1 1.022-.165m0 0a48.11 48.11 0 0 1 14.412 0M6.75 5.625V4.5A2.25 2.25 0 0 1 9 2.25h6a2.25 2.25 0 0 1 2.25 2.25v1.125m-10.5 0h10.5M5.25 5.625h13.5l-.55 14.3a2.25 2.25 0 0 1-2.248 2.075H8.048A2.25 2.25 0 0 1 5.8 19.925L5.25 5.625z"
+        />
+      </svg>
+
+      Excluir
+
+    </button>
+
+  </div>
+` : ''}
+              </div>
+
+              <!-- Contagem de curtidas -->
+              ${(p.likes_count || 0) > 0 ? `<p class="text-xs font-semibold text-slate-200">${p.likes_count === 1 ? '1 curtida' : p.likes_count + ' curtidas'}</p>` : ''}
+
+              <!-- Legenda -->
+              ${p.caption ? `<p class="text-sm text-slate-200 leading-relaxed"><span class="font-semibold text-slate-100">${escapeHtml(p.author || 'Convidado')}</span> <span class="font-light">${escapeHtml(p.caption)}</span></p>` : ''}
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    async function toggleLike(photoId) {
+      if (!accountReady || !currentSessionId) {
+  showIdentityIfNeeded();
+  return;
+}
+      const p = photosList.find(item => item.id === photoId);
+      if (!p) return;
+
+      let likedBy = Array.isArray(p.liked_by) ? p.liked_by : [];
+      let likesCount = p.likes_count || 0;
+      const isLiked = likedBy.includes(currentSessionId);
+
+      if (isLiked) {
+        likedBy = likedBy.filter(id => id !== currentSessionId);
+        likesCount = Math.max(0, likesCount - 1);
+      } else {
+        likedBy.push(currentSessionId);
+        likesCount += 1;
+      }
+
+      p.liked_by = likedBy;
+      p.likes_count = likesCount;
+
+      renderFeed();
+
+      if (supabaseClient) {
+        await supabaseClient.from('photos').update({ likes_count: likesCount, liked_by: likedBy }).eq('id', photoId);
+      } else {
+        saveLocalPhotos();
+      }
+    }
+
+    async function deletePhoto(photoId) {
+      const photo = photosList.find(item => item.id === photoId);
+      // A interface nunca mostra o botão para outra pessoa; esta checagem evita chamadas acidentais.
+      if (!photo) return;
+      if (photo.session_id !== currentSessionId) {
+        alert('Não foi possível confirmar que esta foto pertence ao seu perfil. Entre com o mesmo perfil usado para publicar e tente novamente.');
+        return;
+      }
+      if (!window.confirm('Excluir esta foto do mural? Esta ação não pode ser desfeita.')) return;
+
+      try {
+        // Fotos com este prefixo foram salvas no navegador quando o Supabase
+        // estava indisponível; elas não existem na tabela remota.
+        const isLocalPhoto = typeof photoId === 'string' && photoId.startsWith('photo_');
+        if (supabaseClient && !isLocalPhoto) {
+          const { data: deletedRows, error: dbError } = await supabaseClient
+            .from('photos')
+            .delete()
+            .eq('id', photoId)
+            .eq('session_id', currentSessionId)
+            .select('id');
+          if (dbError) throw dbError;
+          if (!deletedRows || deletedRows.length === 0) {
+            throw new Error('O banco não confirmou a exclusão. Atualize o mural e tente novamente.');
+          }
+
+          // Remove o arquivo apenas quando a URL pertence ao bucket público memories.
+          const marker = '/storage/v1/object/public/memories/';
+          const position = (photo.image_url || '').indexOf(marker);
+          if (position !== -1) {
+            const objectPath = decodeURIComponent(photo.image_url.slice(position + marker.length).split('?')[0]);
+            const { error: storageError } = await supabaseClient.storage.from('memories').remove([objectPath]);
+            if (storageError) console.warn('Post removido, mas o arquivo não pôde ser removido:', storageError);
+          }
+        }
+
+        photosList = photosList.filter(item => item.id !== photoId);
+        if (!supabaseClient || isLocalPhoto) saveLocalPhotos();
+        renderFeed();
+        alert('Postagem excluída com sucesso.');
+      } catch (error) {
+        console.error('Erro ao excluir a foto:', error);
+        alert(error.message || 'Não foi possível excluir a foto. Tente novamente.');
+      }
+    }
+
+    let selectedCompressedFile = null;
+
+    async function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          let w = img.width, h = img.height;
+          const maxDim = 1920;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          const dataUrl = canvas.toDataURL('image/webp', 0.85);
+
+          document.getElementById('imagePreview').src = dataUrl;
+          document.getElementById('imagePreviewContainer').classList.remove('hidden');
+          document.getElementById('dropzone').classList.add('hidden');
+          selectedCompressedFile = dataUrl;
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearFileSelection() {
+      selectedCompressedFile = null;
+      document.getElementById('photoFileInput').value = '';
+      document.getElementById('imagePreviewContainer').classList.add('hidden');
+      document.getElementById('dropzone').classList.remove('hidden');
+    }
+
+    async function handleUploadSubmit(e) {
+      e.preventDefault();
+      if (!accountReady || !currentSessionId) {
+  showIdentityIfNeeded();
+  return;
+}
+      if (!selectedCompressedFile) {
+        alert('Selecione uma foto para publicar.');
+        return;
+      }
+
+      const author = document.getElementById('authorInput').value.trim();
+      if (!author) {
+        alert('Informe seu nome antes de publicar.');
+        document.getElementById('authorInput').focus();
+        return;
+      }
+      rememberedAuthor = author;
+      localStorage.setItem('duda15_author', author);
+      const caption = document.getElementById('captionInput').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando foto...';
+
+      let imageUrl = selectedCompressedFile;
+
+      if (supabaseClient) {
+        try {
+          const blob = await (await fetch(selectedCompressedFile)).blob();
+          const fileName = Date.now() + '_' + Math.random().toString(36).substring(2, 7) + '.webp';
+          const { data: stData, error: stErr } = await supabaseClient.storage.from('memories').upload(fileName, blob, { contentType: 'image/webp' });
+
+          if (!stErr) {
+            const { data: pubData } = supabaseClient.storage.from('memories').getPublicUrl(fileName);
+            imageUrl = pubData.publicUrl;
+          }
+
+          const { data: dbData, error: dbErr } = await supabaseClient.from('photos').insert([{
+  image_url: imageUrl,
+  author: author,
+  caption: caption,
+  likes_count: 0,
+  liked_by: [],
+  session_id: currentSessionId,
+  profile_photo: profilePhoto || ''
+}]).select().single();
+
+          if (!dbErr && dbData) {
+            photosList.unshift(dbData);
+          }
+        } catch (err) {
+          console.error('Supabase upload fallback to local:', err);
+        }
+      }
+
+      if (!supabaseClient || !imageUrl.startsWith('http')) {
+        const newPhoto = {
+          id: 'photo_' + Date.now(),
+          image_url: imageUrl,
+          author: author,
+          caption: caption,
+          likes_count: 0,
+          liked_by: [],
+          session_id: currentSessionId,
+          created_at: new Date().toISOString()
+        };
+        photosList.unshift(newPhoto);
+        saveLocalPhotos();
+      }
+
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 50, spread: 50, origin: { y: 0.6 }, colors: ['#d4af37', '#f3e5ab', '#ffffff'] });
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Publicar no Mural';
+      closeUploadModal();
+      renderFeed();
+    }
+
+    function openUploadModal() {
+      if (!accountReady || !rememberedAuthor) {
+        showIdentityIfNeeded();
+        return;
+      }
+      clearFileSelection();
+      // O nome informado na abertura acompanha todas as publicações deste navegador.
+      document.getElementById('authorInput').value = rememberedAuthor;
+      document.getElementById('uploadAuthorName').textContent = rememberedAuthor;
+      document.getElementById('captionInput').value = '';
+      document.getElementById('uploadModal').classList.remove('hidden');
+    }
+    function closeUploadModal() { document.getElementById('uploadModal').classList.add('hidden'); }
+
+    function openLightbox(photoId) {
+      const p = photosList.find(item => item.id === photoId);
+      if (!p) return;
+      document.getElementById('lightboxImg').src = p.image_url;
+      document.getElementById('lightboxAuthor').textContent = p.author || 'Convidado Especial';
+      document.getElementById('lightboxTime').textContent = formatTimeAgo(p.created_at);
+      document.getElementById('lightboxCaption').textContent = p.caption ? `"${p.caption}"` : '';
+      document.getElementById('lightboxModal').classList.remove('hidden');
+    }
+    function closeLightbox() { document.getElementById('lightboxModal').classList.add('hidden'); }
+    function openEditCaption(photoId) {
+  const photo = photosList.find(p => p.id === photoId);
+
+  if (!photo) return;
+
+  // Só o dono da foto pode editar a legenda
+  if (photo.session_id !== currentSessionId) {
+    return;
+  }
+
+  editingCaptionPhotoId = photoId;
+
+  const input = document.getElementById('editCaptionInput');
+
+  input.value = photo.caption || '';
+
+  document
+    .getElementById('editCaptionModal')
+    .classList.remove('hidden');
+
+  input.focus();
+input.setSelectionRange(
+  input.value.length,
+  input.value.length
+);
+}
+
+
+function closeEditCaption() {
+  editingCaptionPhotoId = null;
+
+  document
+    .getElementById('editCaptionModal')
+    .classList.add('hidden');
+}
+
+
+async function saveEditedCaption() {
+  if (!editingCaptionPhotoId) return;
+
+  const photo = photosList.find(
+    p => p.id === editingCaptionPhotoId
+  );
+
+  if (!photo) {
+    closeEditCaption();
+    return;
+  }
+
+  // Só o dono da foto pode editar
+  if (photo.session_id !== currentSessionId) {
+    closeEditCaption();
+    return;
+  }
+
+  const input = document.getElementById('editCaptionInput');
+  const newCaption = input.value.trim();
+
+  // Guarda a legenda anterior caso seja necessário desfazer
+  const previousCaption = photo.caption || '';
+
+  // Atualiza imediatamente na tela
+  photo.caption = newCaption;
+
+  // Fecha o modal IMEDIATAMENTE
+  closeEditCaption();
+
+  // Atualiza o mural imediatamente
+  renderFeed();
+
+  // Salva no Supabase em segundo plano
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from('photos')
+        .update({
+          caption: newCaption
+        })
+        .eq('id', photo.id)
+        .eq('session_id', currentSessionId);
+
+      if (error) {
+        throw error;
+      }
+
+    } catch (error) {
+
+      console.error(
+        'Erro ao salvar legenda:',
+        error
+      );
+
+      // Se o banco falhar, restaura a legenda anterior
+      photo.caption = previousCaption;
+
+      renderFeed();
+
+      alert(
+        'Não foi possível salvar a legenda. Tente novamente.'
+      );
+    }
+
+  } else {
+
+    saveLocalPhotos();
+
+  }
+}
+    function openPublicProfile(sessionId) {
+  const userPhotos = photosList.filter(p => p.session_id === sessionId);
+
+  if (!userPhotos.length) return;
+
+  const firstPhoto = userPhotos.find(p => p.profile_photo) || userPhotos[0];
+
+  const name = firstPhoto.author || 'Convidado Especial';
+  const photo = firstPhoto.profile_photo || '';
+
+  document.getElementById('publicProfileName').textContent = name;
+
+  document.getElementById('publicProfileCount').textContent =
+    `${userPhotos.length} ${userPhotos.length === 1 ? 'foto compartilhada' : 'fotos compartilhadas'}`;
+
+  const avatar = document.getElementById('publicProfileAvatar');
+
+  if (photo) {
+    avatar.innerHTML = `
+      <img
+        src="${photo}"
+        alt="Foto de perfil"
+        class="w-full h-full object-cover"
+      >
+    `;
+  } else {
+    avatar.textContent = (name || 'C')[0].toUpperCase();
+  }
+
+  const photosContainer = document.getElementById('publicProfilePhotos');
+
+  photosContainer.innerHTML = userPhotos.map(p => `
+    <button
+      onclick="closePublicProfile(); openLightbox('${p.id}')"
+      class="aspect-square overflow-hidden rounded-lg bg-black group"
+    >
+      <img
+        src="${p.image_url}"
+        alt="Foto de ${escapeHtml(name)}"
+        loading="lazy"
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      >
+    </button>
+  `).join('');
+
+  document.getElementById('publicProfileModal').classList.remove('hidden');
+}
+
+function closePublicProfile() {
+  document.getElementById('publicProfileModal').classList.add('hidden');
+}
+
+    function setSortMode(mode) {
+      sortMode = mode;
+
+      // Atualiza a navegação inferior mobile.
+      ['navMural', 'navDestaques', 'navMinhas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-slate-400 transition-colors';
+      });
+
+      if (mode === 'recent') {
+        const el = document.getElementById('navMural'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
+      } else if (mode === 'highlights') {
+        const el = document.getElementById('navDestaques'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
+      } else if (mode === 'my-photos') {
+        const el = document.getElementById('navMinhas'); if (el) el.className = 'flex flex-col items-center justify-center gap-0.5 p-1.5 text-amber-300 transition-colors';
+      }
+
+      renderFeed();
+    }
+    function searchGuests() {
+  const input = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (!input || !results) return;
+
+  const term = input.value.trim().toLowerCase();
+
+  if (!term) {
+    results.innerHTML = '';
+    results.classList.add('hidden');
+    return;
+  }
+
+  const guestsMap = new Map();
+
+  photosList.forEach(p => {
+    if (!p.session_id) return;
+
+    const name = p.author || 'Convidado Especial';
+
+    if (name.toLowerCase().includes(term)) {
+      if (!guestsMap.has(p.session_id)) {
+        guestsMap.set(p.session_id, p);
+      }
+    }
+  });
+
+  const guests = [...guestsMap.values()];
+
+  if (!guests.length) {
+    results.innerHTML = `
+      <div class="px-4 py-4 text-sm text-slate-400 text-center">
+        Nenhum convidado encontrado.
+      </div>
+    `;
+
+    results.classList.remove('hidden');
+    return;
+  }
+
+  results.innerHTML = guests.map(p => {
+
+    const name = p.author || 'Convidado Especial';
+    const initial = name[0].toUpperCase();
+
+    return `
+      <button
+        onclick="selectGuestFromSearch('${p.session_id}')"
+        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-500/10 transition-colors text-left"
+      >
+
+        <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 bg-gradient-to-br from-amber-600 to-indigo-800 border border-amber-400/25 flex items-center justify-center text-sm font-bold text-white">
+
+          ${
+            p.profile_photo
+              ? `<img src="${p.profile_photo}" alt="Foto de ${escapeHtml(name)}" class="w-full h-full object-cover">`
+              : initial
+          }
+
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-slate-100 truncate">
+            ${escapeHtml(name)}
+          </p>
+
+          <p class="text-[11px] text-slate-400">
+            Ver perfil e fotos
+          </p>
+        </div>
+
+      </button>
+    `;
+  }).join('');
+
+  results.classList.remove('hidden');
+}
+
+function selectGuestFromSearch(sessionId) {
+  const input = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (input) input.value = '';
+  if (results) results.classList.add('hidden');
+
+  openPublicProfile(sessionId);
+}
+
+document.addEventListener('click', function(event) {
+  const searchArea = document.getElementById('guestSearchInput');
+  const results = document.getElementById('guestSearchResults');
+
+  if (!searchArea || !results) return;
+
+  if (
+    event.target !== searchArea &&
+    !results.contains(event.target)
+  ) {
+    results.classList.add('hidden');
+  }
+});
+
+    function formatTimeAgo(isoString) {
+      if (!isoString) return 'agora';
+      const diff = Math.floor((new Date().getTime() - new Date(isoString).getTime()) / 1000);
+      if (diff < 60) return 'agora mesmo';
+      if (diff < 3600) return `há ${Math.floor(diff / 60)} min`;
+      if (diff < 86400) return `há ${Math.floor(diff / 3600)}h`;
+      return new Date(isoString).toLocaleDateString('pt-BR');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+  initStarryCanvas();
+});
+  </script>
 </body>
 </html>
