@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Moderação de Memórias | Eduarda 15 Anos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            starry: { night: '#040714', deep: '#080d22', navy: '#0f1736', gold: '#d4af37' }
+          },
+          fontFamily: { serif: ['Playfair Display', 'serif'], sans: ['Outfit', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Identity Services (GIS) & API Google -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="js/google-api.js"></script>
+
+  <style>
+    body {
+      background-color: #040714;
+      color: #f8f6f0;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ==============================================================================
+       IMAGEM DE FUNDO OFICIAL (A NOITE ESTRELADA DE VAN GOGH - WIKIMEDIA)
+       ============================================================================== */
+    .van-gogh-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(180deg, rgba(4, 7, 20, 0.82) 0%, rgba(4, 7, 20, 0.92) 100%),
+        url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Vincent%20van%20Gogh%20Starry%20Night.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-color: #040714;
+    }
+
+    .glass-panel {
+      background: rgba(10, 15, 36, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    .gold-button {
+      background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+      color: #040714;
+      font-weight: 600;
+    }
+
+    .touch-target {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body class="relative flex flex-col min-h-screen">
+  <div class="van-gogh-bg"></div>
+  <canvas id="starryCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 w-full glass-panel border-b border-amber-500/15 px-3.5 py-3.5 sm:px-8">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-1.5 text-xs sm:text-sm text-amber-300/90 hover:text-amber-100 font-light tracking-wide touch-target">
+        ← Voltar ao Mural
+      </a>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 border border-amber-500/20 text-amber-300 text-[11px] font-light tracking-wider uppercase">
+          Moderação Google
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-8 z-10 relative">
+
+    <!-- Auth Login Dialog -->
+    <div id="authDialog" class="max-w-md mx-auto my-8 sm:my-12 p-6 sm:p-8 glass-panel rounded-3xl border border-amber-500/20 shadow-2xl text-center">
+      <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+        <svg class="w-6 h-6 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <h2 class="font-serif text-xl sm:text-2xl font-normal text-slate-100 mb-2">Painel de Moderação</h2>
+      <p class="text-xs text-slate-300 font-light leading-relaxed mb-5">
+        Acesse com sua senha de administrador ou conecte sua conta Google autorizada.
+      </p>
+
+      <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+        <input type="password" id="adminPasswordInput" placeholder="Senha do Administrador" class="w-full px-4 py-3 rounded-xl bg-slate-950/70 border border-slate-800 focus:border-amber-400 text-slate-100 text-xs text-center outline-none tracking-widest" />
+        <p id="authErrorMsg" class="hidden text-xs text-rose-400 font-medium">Senha incorreta. Tente novamente.</p>
+        <button type="submit" id="adminLoginBtn" class="w-full py-3.5 rounded-xl gold-button text-xs font-semibold shadow-lg touch-target">
+          Entrar no Painel
+        </button>
+      </form>
+
+      <div class="flex items-center gap-3 my-4">
+        <span class="h-px flex-1 bg-slate-700/60"></span>
+        <span class="text-[10px] uppercase tracking-widest text-slate-500">ou</span>
+        <span class="h-px flex-1 bg-slate-700/60"></span>
+      </div>
+
+      <!-- Login com Google para Administrador -->
+      <div id="googleAdminLoginBtnContainer" class="flex justify-center min-h-[44px]"></div>
+      <button id="customAdminGoogleBtn" onclick="triggerAdminGoogleSignIn()" class="w-full py-3 rounded-xl bg-white text-slate-800 text-xs font-semibold shadow-lg touch-target flex items-center justify-center gap-2 hover:bg-slate-100 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M21.35 12.23c0-.71-.06-1.39-.18-2.05H12v3.87h5.24a4.48 4.48 0 01-1.94 2.94v2.51h3.14c1.84-1.69 2.91-4.19 2.91-7.27z"/><path fill="#34A853" d="M12 21.75c2.63 0 4.84-.87 6.45-2.35l-3.14-2.51c-.87.58-1.99.92-3.31.92-2.54 0-4.7-1.72-5.47-4.02H3.3v2.59A9.75 9.75 0 0012 21.75z"/><path fill="#FBBC05" d="M6.53 13.79A5.87 5.87 0 016.23 12c0-.62.11-1.22.3-1.79V7.62H3.3A9.75 9.75 0 002.25 12c0 1.57.38 3.05 1.05 4.38l3.23-2.59z"/><path fill="#EA4335" d="M12 6.19c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 3.28 14.63 2.25 12 2.25A9.75 9.75 0 003.3 7.62l3.23 2.59C7.3 7.91 9.46 6.19 12 6.19z"/></svg>
+        Entrar com Conta Google Admin
+      </button>
+    </div>
+
+    <!-- Admin Content Dashboard -->
+    <div id="adminDashboard" class="hidden space-y-6 sm:space-y-8">
+      <!-- Metrics Overview -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Total Memórias</div>
+            <div id="totalPhotosCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Curtidas</div>
+            <div id="totalLikesCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Comentários</div>
+            <div id="totalCommentsCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 glass-panel rounded-2xl border border-amber-500/20 flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+          </div>
+          <div>
+            <div class="text-[10px] sm:text-[11px] text-amber-200/60 uppercase tracking-wider font-light">Convidados</div>
+            <div id="totalUsersCount" class="font-serif text-xl sm:text-2xl font-normal text-slate-100">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 class="font-serif text-lg sm:text-xl font-normal text-slate-100">
+            Mural de Memórias dos Convidados
+          </h2>
+          <p id="dbStatusBadge" class="text-xs font-medium text-emerald-400 mt-0.5">Google Sheets & Drive Conectado</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="loadAdminPhotos()" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-medium text-slate-300 hover:text-white touch-target">
+            Atualizar Dados
+          </button>
+          <button onclick="handleLogout()" class="px-3.5 py-2 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs font-medium text-rose-300 touch-target">
+            Sair
+          </button>
+        </div>
+      </div>
+
+      <!-- Photos Management Table -->
+      <div id="tableContainer" class="glass-panel rounded-3xl overflow-hidden border border-amber-500/20 shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs sm:text-sm">
+            <thead class="bg-slate-950/80 text-amber-200/70 uppercase tracking-wider font-light border-b border-slate-800 text-[10px] sm:text-[11px]">
+              <tr>
+                <th class="py-3.5 px-4">Mídia</th>
+                <th class="py-3.5 px-4">Tipo</th>
+                <th class="py-3.5 px-4">Autor</th>
+                <th class="py-3.5 px-4">Legenda</th>
+                <th class="py-3.5 px-4">Data/Hora</th>
+                <th class="py-3.5 px-4">Curtidas</th>
+                <th class="py-3.5 px-4">Comentários</th>
+                <th class="py-3.5 px-4 text-right">Ação</th>
+              </tr>
+            </thead>
+            <tbody id="photosTableBody" class="divide-y divide-slate-800/60 font-light"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Configuração Google para o Painel de Moderação
+    window.GOOGLE_CONFIG = {
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw0MRXr3_grf2ubOaCNOm6n7i5RhRygtDzSsNuOHyx8Uv_EHvh9TwESFq7GcdRhFk512A/exec',
+      GOOGLE_CLIENT_ID: '23490300845-07d6t2m6phr219cbvsgfjb734ttpn73t.apps.googleusercontent.com'
+    };
+
+    let adminPhotos = [];
+    let savedAdminSecret = sessionStorage.getItem('duda15_admin_secret') || '';
+
+    // ==============================================================================
+    // AUTENTICAÇÃO DO ADMINISTRADOR
+    // ==============================================================================
+
+    function initAdminGoogle() {
+      // Sincroniza configuração
+      GOOGLE_API.setConfig({
+        appsScriptUrl: window.GOOGLE_CONFIG.APPS_SCRIPT_URL,
+        clientId: window.GOOGLE_CONFIG.GOOGLE_CLIENT_ID
+      });
+
+      const clientId = GOOGLE_API.getConfig().clientId;
+      if (!clientId || clientId.includes('YOUR_CLIENT_ID')) return;
+
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.id) {
+        setTimeout(initAdminGoogle, 300);
+        return;
+      }
+
+      try {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleAdminGoogleResponse
+        });
+
+        const container = document.getElementById('googleAdminLoginBtnContainer');
+        if (container) {
+          google.accounts.id.renderButton(container, {
+            theme: 'outline',
+            size: 'large',
+            text: 'signin_with',
+            shape: 'pill',
+            locale: 'pt-BR',
+            width: 260
+          });
+          const customBtn = document.getElementById('customAdminGoogleBtn');
+          if (customBtn) customBtn.classList.add('hidden');
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar Google Identity no admin:', e);
+      }
+    }
+
+    async function handleAdminGoogleResponse(response) {
+      if (!response || !response.credential) return;
+      try {
+        const res = await GOOGLE_API.loginGoogle(response.credential);
+        if (res && res.success && res.user && res.user.role === 'admin') {
+          sessionStorage.setItem('admin_logged', 'true');
+          showDashboard();
+          loadAdminPhotos();
+        } else {
+          alert('Sua conta Google não possui permissão de administrador na planilha.');
+        }
+      } catch (err) {
+        alert('Erro ao validar acesso Google: ' + err.message);
+      }
+    }
+
+    function triggerAdminGoogleSignIn() {
+      if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+        google.accounts.id.prompt();
+      } else {
+        alert('Aguarde o carregamento do Google...');
+      }
+    }
+
+    async function handleAdminLogin(e) {
+      e.preventDefault();
+      const pass = document.getElementById('adminPasswordInput').value.trim();
+      const btn = document.getElementById('adminLoginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Verificando...';
+
+      // Validação no backend Google Apps Script
+      if (GOOGLE_API.isConfigured()) {
+        try {
+          const res = await GOOGLE_API.adminLoginSecret(pass);
+          if (res && res.success) {
+            savedAdminSecret = pass;
+            sessionStorage.setItem('duda15_admin_secret', pass);
+            sessionStorage.setItem('admin_logged', 'true');
+            showDashboard();
+            loadAdminPhotos();
+            btn.disabled = false;
+            btn.textContent = 'Entrar no Painel';
+            return;
+          }
+        } catch (err) {
+          console.warn('Tentativa via API Apps Script:', err);
+        }
+      }
+
+      // Validação local de contingência
+      if (pass === 'Dani1980' || pass === 'duda15anos') {
+        savedAdminSecret = pass;
+        sessionStorage.setItem('duda15_admin_secret', pass);
+        sessionStorage.setItem('admin_logged', 'true');
+        showDashboard();
+        loadAdminPhotos();
+      } else {
+        document.getElementById('authErrorMsg').classList.remove('hidden');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Entrar no Painel';
+    }
+
+    function showDashboard() {
+      document.getElementById('authDialog').classList.add('hidden');
+      document.getElementById('adminDashboard').classList.remove('hidden');
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('admin_logged');
+      sessionStorage.removeItem('duda15_admin_secret');
+      document.getElementById('authDialog').classList.remove('hidden');
+      document.getElementById('adminDashboard').classList.add('hidden');
+    }
+
+    // ==============================================================================
+    // CARREGAMENTO E GERENCIAMENTO DOS DADOS
+    // ==============================================================================
+
+    async function loadAdminPhotos() {
+      const dbBadge = document.getElementById('dbStatusBadge');
+
+      if (GOOGLE_API.isConfigured()) {
+        try {
+          dbBadge.textContent = 'Google Sheets & Drive Conectado';
+          dbBadge.className = 'text-xs font-medium text-emerald-400 mt-0.5';
+
+          const res = await GOOGLE_API.adminGetStats(savedAdminSecret);
+          if (res && res.success) {
+            adminPhotos = res.posts || [];
+            const stats = res.stats || {};
+            document.getElementById('totalPhotosCount').textContent = stats.totalPosts || adminPhotos.length;
+            document.getElementById('totalLikesCount').textContent = stats.totalLikes || 0;
+            document.getElementById('totalCommentsCount').textContent = stats.totalComments || 0;
+            document.getElementById('totalUsersCount').textContent = stats.totalUsers || 0;
+            renderAdminTable();
+            return;
+          }
+        } catch (e) {
+          console.warn('Erro ao carregar do Apps Script:', e);
+        }
+      }
+
+      // Fallback para cache local
+      dbBadge.textContent = 'Modo Local / Cache';
+      dbBadge.className = 'text-xs font-medium text-amber-400 mt-0.5';
+      const localData = localStorage.getItem('duda15_photos');
+      adminPhotos = localData ? JSON.parse(localData) : [];
+
+      const totalLikes = adminPhotos.reduce((acc, p) => acc + (p.likes_count || 0), 0);
+      const totalComments = adminPhotos.reduce((acc, p) => acc + (p.comentarios_count || 0), 0);
+      document.getElementById('totalPhotosCount').textContent = adminPhotos.length;
+      document.getElementById('totalLikesCount').textContent = totalLikes;
+      document.getElementById('totalCommentsCount').textContent = totalComments;
+      document.getElementById('totalUsersCount').textContent = '1';
+
+      renderAdminTable();
+    }
+
+    function renderAdminTable() {
+      const tbody = document.getElementById('photosTableBody');
+
+      if (adminPhotos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 text-xs">Nenhuma publicação encontrada até o momento.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = adminPhotos.map(p => {
+        const isVideo = p.media_type === 'video';
+        const displaySrc = p.miniatura_dados || p.image_url || '';
+        const isRemoved = p.status === 'removido';
+
+        return `
+          <tr class="hover:bg-slate-900/40 transition-colors ${isRemoved ? 'opacity-40 line-through' : ''}">
+            <td class="py-3 px-4">
+              <div class="relative w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-black overflow-hidden border border-amber-500/20">
+                <img src="${displaySrc}" class="w-full h-full object-cover" alt="Thumb" />
+                ${isVideo ? '<span class="absolute bottom-0 right-0 text-[9px] bg-black/70 text-amber-300 px-1 rounded">▶</span>' : ''}
+              </div>
+            </td>
+            <td class="py-3 px-4">
+              <span class="text-[11px] px-2 py-0.5 rounded-full ${isVideo ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}">
+                ${isVideo ? 'Vídeo' : 'Foto'}
+              </span>
+            </td>
+            <td class="py-3 px-4 font-medium text-slate-200">${escapeHtml(p.author || 'Convidado Especial')}</td>
+            <td class="py-3 px-4 max-w-[150px] sm:max-w-xs truncate text-slate-300">${p.caption ? `"${escapeHtml(p.caption)}"` : '-'}</td>
+            <td class="py-3 px-4 text-slate-400 whitespace-nowrap">${formatDate(p.created_at)}</td>
+            <td class="py-3 px-4 text-amber-300 font-medium">${p.likes_count || 0}</td>
+            <td class="py-3 px-4 text-blue-300 font-medium">${p.comentarios_count || 0}</td>
+            <td class="py-3 px-4 text-right">
+              ${!isRemoved ? `
+                <button onclick="deletePhotoByAdmin('${p.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 transition-colors font-light text-xs touch-target">
+                  Excluir
+                </button>
+              ` : '<span class="text-xs text-slate-500">Removida</span>'}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function deletePhotoByAdmin(photoId) {
+      if (!confirm('Deseja realmente apagar esta publicação? O registro na planilha será marcado como removido e o arquivo no Google Drive será movido para a lixeira.')) return;
+
+      if (GOOGLE_API.isConfigured()) {
+        try {
+          const res = await GOOGLE_API.adminDeletePost(photoId, savedAdminSecret);
+          if (res && res.success) {
+            alert('Publicação excluída com sucesso.');
+            loadAdminPhotos();
+            return;
+          } else {
+            alert(res?.error || 'Erro ao excluir publicação no Google Sheets.');
+          }
+        } catch (err) {
+          alert('Erro de conexão ao excluir: ' + err.message);
+        }
+      }
+
+      // Local
+      adminPhotos = adminPhotos.filter(item => item.id !== photoId);
+      localStorage.setItem('duda15_photos', JSON.stringify(adminPhotos));
+      renderAdminTable();
+    }
+
+    function formatDate(isoStr) {
+      if (!isoStr) return '-';
+      return new Date(isoStr).toLocaleString('pt-BR');
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Starry Canvas
+      const canvas = document.getElementById('starryCanvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+        window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+        const stars = Array.from({ length: 50 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5, a: Math.random() }));
+        function anim() {
+          ctx.clearRect(0, 0, w, h);
+          stars.forEach(s => { ctx.fillStyle = '#d4af37'; ctx.globalAlpha = s.a; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); });
+          requestAnimationFrame(anim);
+        }
+        anim();
+      }
+
+      initAdminGoogle();
+
+      if (sessionStorage.getItem('admin_logged') === 'true') {
+        showDashboard();
+        loadAdminPhotos();
+      }
+    });
+  </script>
+</body>
+</html>
